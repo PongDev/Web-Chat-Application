@@ -1,6 +1,14 @@
+import createCache from "@emotion/cache";
 import { createTheme } from "@mui/material";
+import { Kanit } from "@next/font/google";
 
-export const theme = createTheme({
+export const kanit = Kanit({
+  weight: ["300", "400", "500"],
+  style: ["normal", "italic"],
+  subsets: ["latin", "thai"],
+});
+
+const theme = createTheme({
   palette: {
     primary: {
       main: "#7B57D0",
@@ -34,4 +42,22 @@ export const theme = createTheme({
       main: "#B00020",
     },
   },
+  typography: {
+    fontFamily: kanit.style.fontFamily,
+  },
 });
+
+export function createEmotionCache() {
+  let insertionPoint;
+
+  if (typeof document !== "undefined") {
+    const emotionInsertionPoint = document.querySelector<HTMLMetaElement>(
+      'meta[name="emotion-insertion-point"]'
+    );
+    insertionPoint = emotionInsertionPoint ?? undefined;
+  }
+
+  return createCache({ key: "mui-style", insertionPoint });
+}
+
+export default theme;
