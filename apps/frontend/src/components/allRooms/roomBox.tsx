@@ -23,8 +23,8 @@ const RoomBox = ({ currentUser, roomName }: IRoomBoxProps) => {
       }}
     >
       <CardContent>
-        <Stack direction="column" spacing={2} justifyItems="center">
-          <Stack direction="row" justifyContent="right">
+        <Stack direction="column" spacing={2} justifyContent="center">
+          <Stack direction="row" justifyContent="right" alignItems="center">
             <PeopleIcon fontSize="small" color="primary" />
             <Typography variant="subtitle2" align="right" color="primary">
               {" "}
