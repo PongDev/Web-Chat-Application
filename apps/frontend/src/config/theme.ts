@@ -44,6 +44,58 @@ const theme = createTheme({
   },
   typography: {
     fontFamily: kanit.style.fontFamily,
+    h1: {
+      fontSize: "6rem",
+      lineHeight: "7rem",
+    },
+    h2: {
+      fontSize: "3.75rem",
+      lineHeight: "4.5rem",
+    },
+    h3: {
+      fontSize: "3rem",
+      lineHeight: "3.5rem",
+    },
+    h4: {
+      fontSize: "2rem",
+      lineHeight: "2.25rem",
+    },
+    h5: {
+      fontSize: "1.5rem",
+      lineHeight: "1.5rem",
+    },
+    h6: {
+      fontSize: "1.25rem",
+      lineHeight: "1.5rem",
+    },
+    body1: {
+      fontSize: "1rem",
+      lineHeight: "1.25rem",
+    },
+    body2: {
+      fontSize: "0.875rem",
+      lineHeight: "1.25rem",
+    },
+    button: {
+      fontSize: "0.875rem",
+      lineHeight: "1rem",
+    },
+    caption: {
+      fontSize: "0.75rem",
+      lineHeight: "1rem",
+    },
+    overline: {
+      fontSize: "0.625rem",
+      lineHeight: "1rem",
+    },
+    subtitle1: {
+      fontSize: "1rem",
+      lineHeight: "1.5rem",
+    },
+    subtitle2: {
+      fontSize: "0.875rem",
+      lineHeight: "1.5rem",
+    },
   },
 });
 
