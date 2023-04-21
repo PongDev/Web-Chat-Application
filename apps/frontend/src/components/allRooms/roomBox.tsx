@@ -17,7 +17,7 @@ const RoomBox = ({ currentUser, roomName }: IRoomBoxProps) => {
   return (
     <Card
       sx={{
-        backgroundColor: (theme as any).palette.secondary["200"],
+        backgroundColor: theme.palette.secondary["200"],
         height: "100%",
         borderRadius: 3,
       }}
