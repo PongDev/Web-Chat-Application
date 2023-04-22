@@ -20,8 +20,16 @@ const clients: IClient[] = [
 const Content = () => {
   return (
     <Stack direction="column" spacing={1} padding={8}>
+      <Typography variant="h4" component="span" paddingBottom={4}>
+        {"Client List"}
+      </Typography>
       {clients.map((client) => (
-        <Stack direction="row" alignItems="center" spacing={2}>
+        <Stack
+          direction="row"
+          alignItems="center"
+          spacing={2}
+          key={client.userId}
+        >
           <Avatar
             src={"https://cdn.myanimelist.net/images/characters/6/496453.jpg"}
             sx={{ width: 52, height: 52 }}
