@@ -4,7 +4,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   Grid,
   IconButton,
@@ -14,7 +13,7 @@ import {
 import React from "react";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RoomBox from "./roomBox";
-import theme from "@/config/theme";
+import useCreateRoomDialog from "@/hooks/useCreateRoomDialog";
 interface IRoom {
   roomId: string;
   currentUser: number;
@@ -34,29 +33,15 @@ const cards: IRoom[] = [
   { roomId: "7", currentUser: 15, roomName: "9595959efsffs" },
 ];
 const Content = () => {
-  const [open, setOpen] = React.useState(false);
-  const [newRoomName, setNewRoomName] = React.useState("");
-  const [submitted, setSubmitted] = React.useState(false);
-  const handleClickOpen = () => {
-    setOpen(true);
-    setSubmitted(false);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setSubmitted(false);
-    setNewRoomName("");
-  };
-  const handleCreate = (newRoomName: string) => {
-    setSubmitted(false);
-    if (newRoomName === "") {
-      setSubmitted(true);
-      return;
-    }
-    setOpen(false);
-    console.log(newRoomName);
-    setNewRoomName("");
-  };
+  const {
+    open,
+    newRoomName,
+    submitted,
+    handleClickOpen,
+    handleClose,
+    handleCreate,
+    setNewRoomName,
+  } = useCreateRoomDialog();
   return (
     <Box padding={8}>
       <Box sx={{ display: "flex" }} alignItems={"center"} paddingY={4}>
@@ -97,10 +82,10 @@ const Content = () => {
         <DialogTitle variant="h5" align="center">
           Create New Room
         </DialogTitle>
-        <DialogContent>
-          <DialogContentText variant="subtitle1">Room name</DialogContentText>
+        <DialogContent sx={{ paddingY: 0 }}>
           <TextField
             autoFocus
+            label="Room name"
             margin="dense"
             fullWidth
             variant="filled"
@@ -111,7 +96,7 @@ const Content = () => {
             }
           />
         </DialogContent>
-        <DialogActions sx={{ justifyContent: "center" }}>
+        <DialogActions sx={{ justifyContent: "center", paddingTop: 0 }}>
           <Button
             variant="contained"
             color="primary"
