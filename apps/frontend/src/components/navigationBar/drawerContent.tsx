@@ -6,7 +6,15 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
-import { Box, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+} from "@mui/material";
 import PublicIcon from "@mui/icons-material/Public";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 
@@ -32,29 +40,66 @@ function ItemGroups(groupName: String, items: String[]) {
 function HelloHeader() {
   const [open, setOpen] = React.useState(false);
   const [workingName, setWorkingName] = React.useState("<Working Name>");
-  function handleClick() {
-    setOpen(!open);
-  }
+  const [text, setText] = React.useState("");
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleSave = () => {
+    setWorkingName(text);
+    setOpen(false);
+  };
   return (
     <Box paddingX={1} paddingY={2}>
       <Box sx={{ display: "flex", alignItems: "center" }}>
         <Typography variant="h5">Hello</Typography>
-        <IconButton onClick={handleClick}>
+        <IconButton onClick={handleClickOpen}>
           <ModeEditIcon />
         </IconButton>
       </Box>
-      {open ? (
-        <TextField
-          variant="standard"
-          value={workingName}
-          onChange={(e) => setWorkingName(e.target.value)}
-          sx={{ input: { color: "darkorchid" } }}
-        />
-      ) : (
-        <Typography variant="h5" color={"darkorchid"}>
-          {workingName}
-        </Typography>
-      )}
+      <Typography variant="h5" color={"primary"}>
+        {workingName}
+      </Typography>
+
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth="sm"
+        fullWidth
+        sx={{ backdropFilter: "blur(5px)" }}
+        disableRestoreFocus
+      >
+        <DialogTitle variant="h5" align="center">
+          Edit Username
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="New Username"
+            fullWidth
+            variant="filled"
+            value={text}
+            onChange={(event) => {
+              setText(event.target.value);
+            }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: "center", paddingTop: 0 }}>
+          <Button
+            variant="contained"
+            sx={{ borderRadius: 6, minWidth: 100 }}
+            onClick={handleSave}
+            color="primary"
+          >
+            Update
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

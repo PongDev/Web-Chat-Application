@@ -7,7 +7,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { Box } from "@mui/material";
-import DrawerContent from "./content";
+import DrawerContent from "./drawerContent";
 
 export function NavBar() {
   const drawerWidth = 240;
@@ -24,6 +24,7 @@ export function NavBar() {
         position="fixed"
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
+          display: { sm: "none" },
           ml: { sm: `${drawerWidth}px` },
         }}
       >
@@ -38,7 +39,7 @@ export function NavBar() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Responsive drawer
+            Chat Application
           </Typography>
         </Toolbar>
       </AppBar>
