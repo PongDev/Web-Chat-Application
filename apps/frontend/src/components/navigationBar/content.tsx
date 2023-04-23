@@ -16,7 +16,12 @@ import Typography from "@mui/material/Typography";
 import { Box, Button, InputAdornment, TextField } from "@mui/material";
 import PublicIcon from "@mui/icons-material/Public";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
-import { Key } from "@mui/icons-material";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 
 function ItemGroups(groupName: String, items: String[]) {
   return (
@@ -37,20 +42,40 @@ function ItemGroups(groupName: String, items: String[]) {
   );
 }
 
+function HelloHeader() {
+  const [open, setOpen] = React.useState(false);
+  const [workingName, setWorkingName] = React.useState("<Working Name>");
+  function handleClick() {
+    setOpen(!open);
+  }
+  return (
+    <Box paddingX={1} paddingY={2}>
+      <Box sx={{ display: "flex", alignItems: "center" }}>
+        <Typography variant="h5">Hello</Typography>
+        <IconButton onClick={handleClick}>
+          <ModeEditIcon />
+        </IconButton>
+      </Box>
+      {open ? (
+        <TextField
+          variant="standard"
+          value={workingName}
+          onChange={(e) => setWorkingName(e.target.value)}
+          sx={{ input: { color: "darkorchid" } }}
+        />
+      ) : (
+        <Typography variant="h5" color={"darkorchid"}>
+          {workingName}
+        </Typography>
+      )}
+    </Box>
+  );
+}
+
 function DrawerContent() {
   return (
     <Box paddingLeft={2}>
-      <Box paddingX={1} paddingY={2}>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Typography variant="h5">Hello</Typography>
-          <IconButton>
-            <ModeEditIcon />
-          </IconButton>
-        </Box>
-        <Typography variant="h5" color={"darkorchid"}>
-          {"<Working Name>"}
-        </Typography>
-      </Box>
+      <HelloHeader />
       <List>
         {["All Rooms", "All Clients"].map((text, index) => (
           <ListItem key={text} disablePadding>
