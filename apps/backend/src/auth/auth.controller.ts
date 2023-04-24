@@ -29,7 +29,7 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/user')
+  @Get('/me')
   async getUser(@User() user: JWTPayload) {
     return user;
   }
