@@ -1,7 +1,15 @@
 import { AuthService } from './auth.service';
-import { Body, Controller, Injectable, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Injectable,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { GoogleTokenIDBody, JWTPayload } from 'types';
-import { JwtAuthGuard } from './jwt-refresh-auth.guard';
+import { JwtAuthGuard as RefreshJWTAuthGuard } from './jwt-refresh-auth.guard';
+import { JwtAuthGuard } from './jwt-auth.guard';
 import { User } from './user.decorator';
 
 @Controller('auth')
@@ -14,9 +22,15 @@ export class AuthController {
     return this.authService.googleLogin(body.token);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(RefreshJWTAuthGuard)
   @Post('/token/refresh')
   async renewAccessToken(@User() user: JWTPayload) {
     return this.authService.renewAccessToken(user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/user')
+  async getUser(@User() user: JWTPayload) {
+    return user;
   }
 }
