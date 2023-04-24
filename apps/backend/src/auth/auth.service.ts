@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { backendConfig } from 'config';
 import { OAuth2Client } from 'google-auth-library';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { JWTPayload, JWTToken } from 'types';
 
 @Injectable()
@@ -19,7 +20,10 @@ export class AuthService {
     backendConfig.google.clientSecret,
   );
 
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private prismaService: PrismaService,
+  ) {}
 
   signAccessToken(payload: JWTPayload): string {
     return this.jwtService.sign(payload, this.jwtAccessTokenOptions);
@@ -55,6 +59,28 @@ export class AuthService {
       idToken: token,
     });
 
-    return res;
+    const payload = res.getPayload();
+    const googleId = res.getUserId();
+    const { email, picture, name } = payload;
+
+    const { id } = await this.prismaService.user.upsert({
+      where: { gid: googleId },
+      create: {
+        gid: googleId,
+        email,
+        profileImage: picture,
+        name,
+      },
+      update: {},
+    });
+
+    const jwtPayload: JWTPayload = {
+      userID: `${id}`,
+      email,
+    };
+
+    const jwtToken = await this.generateToken(jwtPayload);
+
+    return jwtToken;
   }
 }

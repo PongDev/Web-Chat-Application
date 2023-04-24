@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import { PrismaService } from './prisma/prisma.service';
 import { backendConfig as config } from 'config';
 import { ValidationPipe } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,6 +12,7 @@ async function bootstrap() {
   const port = config.port;
 
   app.useGlobalPipes(new ValidationPipe());
+  app.use(cookieParser());
 
   if (config.swagger.enable) {
     const swaggerConfig = new DocumentBuilder()
