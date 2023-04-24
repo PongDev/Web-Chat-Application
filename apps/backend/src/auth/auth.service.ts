@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { backendConfig } from 'config';
+import { OAuth2Client } from 'google-auth-library';
 import { JWTPayload, JWTToken } from 'types';
 
 @Injectable()
@@ -13,6 +14,10 @@ export class AuthService {
     secret: backendConfig.jwt.refreshToken.secret,
     expiresIn: backendConfig.jwt.refreshToken.expire,
   };
+  private OAuthClient = new OAuth2Client(
+    backendConfig.google.clientId,
+    backendConfig.google.clientSecret,
+  );
 
   constructor(private jwtService: JwtService) {}
 
@@ -43,5 +48,13 @@ export class AuthService {
       accessToken: await accessToken,
       refreshToken: await refreshToken,
     };
+  }
+
+  async googleLogin(token: string) {
+    const res = await this.OAuthClient.verifyIdToken({
+      idToken: token,
+    });
+
+    return res;
   }
 }
