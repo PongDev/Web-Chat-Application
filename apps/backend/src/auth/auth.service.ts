@@ -54,6 +54,23 @@ export class AuthService {
     };
   }
 
+  async renewAccessToken(
+    user: JWTPayload,
+  ): Promise<Pick<JWTToken, 'accessToken'>> {
+    const { userID, email } = user;
+
+    const jwtPayload: JWTPayload = {
+      userID,
+      email,
+    };
+
+    const jwtToken = await this.signAccessTokenAsync(jwtPayload);
+
+    return {
+      accessToken: jwtToken,
+    };
+  }
+
   async googleLogin(token: string) {
     const res = await this.OAuthClient.verifyIdToken({
       idToken: token,
