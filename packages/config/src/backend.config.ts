@@ -15,6 +15,10 @@ export type BackendConfig = {
       expire: number;
     };
   };
+  google: {
+    clientId: string;
+    clientSecret: string;
+  };
   swagger: {
     enable: boolean;
     prefixPath: string;
@@ -39,6 +43,10 @@ export const loadBackendConfig = (): BackendConfig => ({
         parseInt(process.env.BACKEND_JWT_REFRESH_TOKEN_EXPIRE ?? "", 10) ||
         604800,
     },
+  },
+  google: {
+    clientId: process.env.BACKEND_GOOGLE_CLIENT_ID ?? "",
+    clientSecret: process.env.BACKEND_GOOGLE_CLIENT_SECRET ?? "",
   },
   swagger: {
     enable: process.env.BACKEND_SWAGGER_ENABLE === "true",
