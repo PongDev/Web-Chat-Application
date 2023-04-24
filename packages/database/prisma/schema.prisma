@@ -12,7 +12,10 @@ datasource db {
 
 // Add dummy models to make the schema valid
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+  id           String   @id @default(cuid())
+  gid          String   @unique
+  email        String
+  name         String?
+  profileImage String?
+  createdAt    DateTime @default(now())
 }
