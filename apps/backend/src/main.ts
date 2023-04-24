@@ -12,6 +12,11 @@ async function bootstrap() {
   const port = config.port;
 
   app.useGlobalPipes(new ValidationPipe());
+  app.enableCors({
+    credentials: true,
+    origin: true,
+  });
+
   app.use(cookieParser());
 
   if (config.swagger.enable) {
