@@ -7,19 +7,42 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("accessToken");
-  if (token) {
+  if (token && !config.headers.Authorization) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
-apiClient.interceptors.response.use((res) => {
-  if (res.status === 401) {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    window.location.href = "/login";
+apiClient.interceptors.response.use(
+  (res) => res,
+  async (err) => {
+    if (err.response.status === 401 && !err.config.retry) {
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (refreshToken) {
+        try {
+          const res = await axios.post(
+            `${process.env.NEXT_PUBLIC_API_URL}/auth/token/refresh`,
+            {},
+            {
+              headers: {
+                Authorization: `Bearer ${refreshToken}`,
+              },
+            }
+          );
+          localStorage.setItem("accessToken", res.data.accessToken);
+
+          err.config.retry = true;
+          return await apiClient(err.config);
+        } catch (err) {
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+          window.location.href = "/login";
+          throw err;
+        }
+      }
+    }
+    throw err;
   }
-  return res;
-});
+);
 
 export default apiClient;
