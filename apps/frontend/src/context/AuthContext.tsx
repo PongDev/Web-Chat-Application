@@ -13,7 +13,8 @@ import { JWTPayload } from "types";
 interface IAuthContextValue {
   user: JWTPayload | null;
   loading: boolean;
-  logout: () => void;
+  logout: () => Promise<void>;
+  refetch: () => Promise<void>;
 }
 
 const AuthContext = createContext<IAuthContextValue>({} as IAuthContextValue);
@@ -50,8 +51,9 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
       user,
       loading,
       logout,
+      refetch,
     }),
-    [user, loading, logout]
+    [user, loading, logout, refetch]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

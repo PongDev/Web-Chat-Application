@@ -1,10 +1,12 @@
 import apiClient from "@/config/axios";
+import { useUser } from "@/context/AuthContext";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
 import { JWTToken } from "types";
 
 const useGoogleSignin = () => {
   const router = useRouter();
+  const { refetch, user, loading } = useUser();
 
   const handleSignin = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.stopPropagation();
@@ -24,6 +26,8 @@ const useGoogleSignin = () => {
       });
       localStorage.setItem("accessToken", res.data.accessToken);
       localStorage.setItem("refreshToken", res.data.refreshToken);
+
+      await refetch();
       router.push("/");
     },
     [router, apiClient]
@@ -51,7 +55,13 @@ const useGoogleSignin = () => {
   }, [handleCallback]);
 
   useEffect(() => {
-    initGoogleButton();
+    if (router.isReady) {
+      if (user && !loading) {
+        router.push("/");
+        return;
+      }
+      initGoogleButton();
+    }
   }, [initGoogleButton]);
 
   return { handleSignin };
