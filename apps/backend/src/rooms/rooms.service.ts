@@ -1,12 +1,25 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateDMRoomBodyDto, CreateGroupRoomBodyDto, RoomType } from 'types';
+import {
+  CreateDMRoomBodyDto,
+  CreateGroupRoomBodyDto,
+  CreateRoomResultDto,
+  JoinGroupResultDto,
+  JoinedRoomDetailsDto,
+  JoinedRoomsDto,
+  RoomBriefDetailsDto,
+  RoomInfoDto,
+  RoomType,
+} from 'types';
 
 @Injectable()
 export class RoomsService {
   constructor(private prismaService: PrismaService) {}
 
-  private async createNewGroupRoom(name: string, userId: string) {
+  private async createNewGroupRoom(
+    name: string,
+    userId: string,
+  ): Promise<CreateRoomResultDto> {
     return await this.prismaService.$transaction(async (tx) => {
       const newRoom = await tx.room.create({
         data: {},
@@ -26,7 +39,10 @@ export class RoomsService {
     });
   }
 
-  private async createNewDMRoom(userId1: string, userId2: string) {
+  private async createNewDMRoom(
+    userId1: string,
+    userId2: string,
+  ): Promise<CreateRoomResultDto> {
     if (userId1 === userId2)
       throw new BadRequestException('Cannot create DM room with yourself');
 
@@ -67,7 +83,9 @@ export class RoomsService {
     });
   }
 
-  private async getJoinedDMRoom(userId: string) {
+  private async getJoinedDMRoom(
+    userId: string,
+  ): Promise<JoinedRoomDetailsDto[]> {
     const DMRoom = await this.prismaService.directMessageRoom.findMany({
       where: {
         OR: [
@@ -95,7 +113,9 @@ export class RoomsService {
     }));
   }
 
-  private async getJoinedGroupRoom(userId: string) {
+  private async getJoinedGroupRoom(
+    userId: string,
+  ): Promise<JoinedRoomDetailsDto[]> {
     const groupRoom = await this.prismaService.groupRoomUser.findMany({
       where: {
         userId,
@@ -116,16 +136,14 @@ export class RoomsService {
     }));
   }
 
-  async getAllRooms(page: number, limit: number) {
+  async getAllRooms(
+    page: number,
+    limit: number,
+  ): Promise<RoomBriefDetailsDto[]> {
     if (!page) page = 1;
     if (!limit) limit = 10;
 
-    const count = await this.prismaService.groupRoom.count();
-
-    const skip = (page - 1) * limit;
     const rooms = await this.prismaService.groupRoom.findMany({
-      skip,
-      take: limit,
       select: {
         id: true,
         name: true,
@@ -138,22 +156,18 @@ export class RoomsService {
       },
     });
 
-    return {
-      page,
-      maxPage: Math.ceil(count / limit),
-      rooms: rooms.map((room) => ({
-        id: room.id,
-        name: room.name,
-        owner: room.ownerUser.name,
-        users: room.GroupRoomUser.length,
-      })),
-    };
+    return rooms.map((room) => ({
+      id: room.id,
+      name: room.name,
+      owner: room.ownerUser.name,
+      userCount: room.GroupRoomUser.length,
+    }));
   }
 
   async createNewRoom(
     body: CreateGroupRoomBodyDto | CreateDMRoomBodyDto,
     userId: string,
-  ) {
+  ): Promise<CreateRoomResultDto> {
     if (body.type === RoomType.GROUP_ROOM) {
       return await this.createNewGroupRoom(body.name, userId);
     }
@@ -164,7 +178,7 @@ export class RoomsService {
     throw new BadRequestException('Invalid room type');
   }
 
-  async getCreatedRooms(userId: string) {
+  async getCreatedRooms(userId: string): Promise<JoinedRoomDetailsDto[]> {
     const rooms = await this.prismaService.groupRoom.findMany({
       where: {
         owner: userId,
@@ -178,7 +192,7 @@ export class RoomsService {
     return rooms;
   }
 
-  async getJoinedRooms(userId: string) {
+  async getJoinedRooms(userId: string): Promise<JoinedRoomsDto> {
     const directRoom = await this.getJoinedDMRoom(userId);
     const groupRoom = await this.getJoinedGroupRoom(userId);
 
@@ -188,7 +202,10 @@ export class RoomsService {
     };
   }
 
-  async joinGroupRoom(roomId: string, userId: string) {
+  async joinGroupRoom(
+    roomId: string,
+    userId: string,
+  ): Promise<JoinGroupResultDto> {
     const room = await this.prismaService.groupRoom.findFirst({
       where: {
         id: roomId,
@@ -216,7 +233,7 @@ export class RoomsService {
     };
   }
 
-  async getRoomInfo(roomId: string, userId: string) {
+  async getRoomInfo(roomId: string, userId: string): Promise<RoomInfoDto> {
     const room = await this.prismaService.room.findFirst({
       where: {
         id: roomId,

@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { Equals, IsString, ValidateNested } from "class-validator";
+import { IsString, ValidateNested } from "class-validator";
 
 export enum RoomType {
   DIRECT_MESSAGE_ROOM = "DIRECT_MESSAGE_ROOM",
@@ -40,4 +40,33 @@ export class CreateRoomDto {
     keepDiscriminatorProperty: true,
   })
   body: CreateGroupRoomBodyDto | CreateDMRoomBodyDto;
+}
+
+export interface RoomInfoDto {
+  id: string;
+  name: string;
+  channelId: string;
+}
+
+export interface CreateRoomResultDto {
+  id: string;
+}
+
+export interface JoinGroupResultDto {
+  id: string;
+}
+
+export interface JoinedRoomDetailsDto {
+  id: string;
+  name: string;
+}
+
+export interface RoomBriefDetailsDto extends JoinedRoomDetailsDto {
+  owner: string;
+  userCount: number;
+}
+
+export interface JoinedRoomsDto {
+  directRoom: JoinedRoomDetailsDto[];
+  groupRoom: JoinedRoomDetailsDto[];
 }
