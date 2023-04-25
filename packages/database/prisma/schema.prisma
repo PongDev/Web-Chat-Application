@@ -12,10 +12,66 @@ datasource db {
 
 // Add dummy models to make the schema valid
 model User {
-  id           String   @id @default(cuid())
-  gid          String   @unique
-  email        String
-  name         String?
-  profileImage String?
-  createdAt    DateTime @default(now())
+  id                 String              @id @default(cuid())
+  gid                String              @unique
+  email              String
+  name               String?
+  profileImage       String?
+  createdAt          DateTime            @default(now())
+  PrivateRoomMember1 DirectMessageRoom[] @relation("member1_user")
+  PrivateRoomMember2 DirectMessageRoom[] @relation("member2_user")
+  GroupRoomId        String?
+  GroupRoom          GroupRoom[]
+  Message            Message[]
+  GroupRoomUser      GroupRoomUser[]
+}
+
+model Room {
+  id          String             @id @default(cuid())
+  privateRoom DirectMessageRoom?
+  GroupRoom   GroupRoom?
+  Message     Message[]
+}
+
+model DirectMessageRoom {
+  id      String @id @unique @default(cuid())
+  member1 String
+  member2 String
+
+  member1User User @relation("member1_user", fields: [member1], references: [id])
+  member2User User @relation("member2_user", fields: [member2], references: [id])
+  Room        Room @relation(fields: [id], references: [id])
+
+  @@unique([member1, member2])
+}
+
+model GroupRoom {
+  id    String @id @unique @default(cuid())
+  name  String
+  owner String
+
+  room          Room            @relation(fields: [id], references: [id])
+  ownerUser     User            @relation(fields: [owner], references: [id])
+  GroupRoomUser GroupRoomUser[]
+}
+
+model GroupRoomUser {
+  userId String
+  roomId String
+
+  user      User      @relation(fields: [userId], references: [id])
+  groupRoom GroupRoom @relation(fields: [roomId], references: [id])
+
+  @@unique([userId, roomId])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  text      String
+  createdAt DateTime @default(now())
+  senderId  String
+  roomId    String
+
+  senderUser User @relation(fields: [senderId], references: [id])
+  roomRoom   Room @relation(fields: [roomId], references: [id])
 }
