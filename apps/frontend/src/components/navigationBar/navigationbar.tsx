@@ -1,6 +1,5 @@
 import * as React from "react";
 import AppBar from "@mui/material/AppBar";
-import CssBaseline from "@mui/material/CssBaseline";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -8,6 +7,8 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { Box } from "@mui/material";
 import DrawerContent from "./drawerContent";
+
+import theme from "@/config/theme";
 
 export function NavBar() {
   const drawerWidth = 240;
@@ -63,6 +64,12 @@ export function NavBar() {
               width: drawerWidth,
             },
           }}
+          PaperProps={{
+            sx: {
+              width: drawerWidth,
+              backgroundColor: theme.palette.primary[200],
+            },
+          }}
         >
           <DrawerContent />
         </Drawer>
@@ -77,6 +84,12 @@ export function NavBar() {
         "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
       }}
       open
+      PaperProps={{
+        sx: {
+          width: drawerWidth,
+          backgroundColor: theme.palette.primary[200],
+        },
+      }}
     >
       <DrawerContent />
     </Drawer>
@@ -84,10 +97,12 @@ export function NavBar() {
   return (
     <Box
       component="nav"
-      sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+      sx={{
+        width: { sm: drawerWidth },
+        flexShrink: { sm: 0 },
+      }}
       aria-label="mailbox folders"
     >
-      <CssBaseline />
       {navBarForMobile}
       {navBarForDesktop}
     </Box>
