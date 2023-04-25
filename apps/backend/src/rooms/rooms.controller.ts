@@ -23,9 +23,28 @@ export class RoomsController {
     return this.roomsService.createNewRoom(body.body, user.userID);
   }
 
-  @Get('/created')
+  @Get('/joined')
+  @UseGuards(JwtAuthGuard)
+  async getJoinedRooms(@User() user: JWTPayload) {
+    return this.roomsService.getJoinedRooms(user.userID);
+  }
+
+  // Join group room (I guess ?)
+  @Post('/group/join/:roomId')
+  @UseGuards(JwtAuthGuard)
+  async joinRoom(@User() user: JWTPayload, @Query('roomId') roomId: string) {
+    return this.roomsService.joinGroupRoom(user.userID, roomId);
+  }
+
+  @Get('/group/created')
   @UseGuards(JwtAuthGuard)
   async getCreatedRooms(@User() user: JWTPayload) {
     return this.roomsService.getCreatedRooms(user.userID);
+  }
+
+  @Get('/info/:roomId')
+  @UseGuards(JwtAuthGuard)
+  async getRoomInfo(@Query('roomId') roomId: string, @User() user: JWTPayload) {
+    return this.roomsService.getRoomInfo(roomId, user.userID);
   }
 }
