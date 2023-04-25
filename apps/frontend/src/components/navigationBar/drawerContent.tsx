@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography";
 import {
   Box,
   Button,
+  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -16,23 +17,52 @@ import {
   TextField,
 } from "@mui/material";
 import PublicIcon from "@mui/icons-material/Public";
+import PersonIcon from "@mui/icons-material/Person";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
+import theme from "@/config/theme";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 function ItemGroups(groupName: String, items: String[]) {
+  const [open, setOpen] = React.useState(true);
+  const toggleOpen = () => {
+    setOpen(!open);
+  };
   return (
     <Box>
-      <Typography variant="subtitle1" color={"gray"}>
-        {groupName}
-      </Typography>
-      <List>
-        {items.map((text: String, index) => (
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+      {/* <div onClick={() => console.log('Clicked')}> */}
+      <Button
+        variant="text"
+        onClick={toggleOpen}
+        sx={{ textTransform: "none" }}
+        disableRipple
+      >
+        {
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Typography variant="subtitle1" color={"white"}>
+              {groupName}
+            </Typography>
+            {open ? (
+              <KeyboardArrowDownIcon sx={{ color: "white" }} />
+            ) : (
+              <KeyboardArrowRightIcon sx={{ color: "white" }} />
+            )}
+          </Box>
+        }
+      </Button>
+
+      {/* </div> */}
+      <Collapse in={open} timeout="auto" unmountOnExit>
+        <List>
+          {items.map((text: String, index) => (
+            <ListItem disablePadding>
+              <ListItemButton>
+                <ListItemText primary={text} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Collapse>
     </Box>
   );
 }
@@ -58,10 +88,10 @@ function HelloHeader() {
       <Box sx={{ display: "flex", alignItems: "center" }}>
         <Typography variant="h5">Hello</Typography>
         <IconButton onClick={handleClickOpen}>
-          <ModeEditIcon />
+          <ModeEditIcon sx={{ color: theme.palette.primary[500] }} />
         </IconButton>
       </Box>
-      <Typography variant="h5" color={"primary"}>
+      <Typography variant="h5" color={theme.palette.primary[800]}>
         {workingName}
       </Typography>
 
@@ -110,10 +140,10 @@ function DrawerContent() {
       <HelloHeader />
       <List>
         {["All Rooms", "All Clients"].map((text, index) => (
-          <ListItem key={text} disablePadding>
+          <ListItem key={text} color="black" disablePadding>
             <ListItemButton>
               <ListItemIcon>
-                <PublicIcon />
+                {index == 0 ? <PublicIcon /> : <PersonIcon />}
               </ListItemIcon>
               <ListItemText primary={text} />
             </ListItemButton>
