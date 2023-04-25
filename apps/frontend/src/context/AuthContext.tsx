@@ -26,7 +26,7 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
 
   const refetch = useCallback(async () => {
     try {
-      const res = await apiClient.get<JWTPayload>("/auth/me");
+      const res = await apiClient.get<JWTPayload>("/users/me");
       setUser(res.data);
     } catch (err) {
       setUser(null);
