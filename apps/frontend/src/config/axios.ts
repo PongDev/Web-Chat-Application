@@ -16,7 +16,7 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (res) => res,
   async (err) => {
-    if (err.response.status === 401 && !err.config.retry) {
+    if (err?.response?.status === 401 && !err?.config?.retry) {
       const refreshToken = localStorage.getItem("refreshToken");
       if (refreshToken) {
         try {
@@ -39,6 +39,10 @@ apiClient.interceptors.response.use(
           window.location.href = "/login";
           throw err;
         }
+      } else {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        window.location.href = "/login";
       }
     }
     throw err;

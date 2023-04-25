@@ -62,7 +62,7 @@ export class AuthService {
     const jwtPayload: JWTPayload = {
       userID,
       name,
-      picture,
+      profileImage: picture,
     };
 
     const jwtToken = await this.signAccessTokenAsync(jwtPayload);
@@ -95,7 +95,7 @@ export class AuthService {
     const jwtPayload: JWTPayload = {
       userID: `${id}`,
       name,
-      picture,
+      profileImage: picture,
     };
 
     const jwtToken = await this.generateToken(jwtPayload);
