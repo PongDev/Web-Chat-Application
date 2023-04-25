@@ -28,6 +28,7 @@ model User {
 
 model Room {
   id          String             @id @default(cuid())
+  channelId   String?
   privateRoom DirectMessageRoom?
   GroupRoom   GroupRoom?
   Message     Message[]
