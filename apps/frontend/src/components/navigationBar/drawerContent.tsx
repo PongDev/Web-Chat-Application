@@ -23,7 +23,7 @@ import theme from "@/config/theme";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
-function ItemGroups(groupName: String, items: String[]) {
+function ItemGroups(groupName: string, items: string[]) {
   const [open, setOpen] = React.useState(true);
   const toggleOpen = () => {
     setOpen(!open);
@@ -54,8 +54,8 @@ function ItemGroups(groupName: String, items: String[]) {
       {/* </div> */}
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List>
-          {items.map((text: String, index) => (
-            <ListItem disablePadding>
+          {items.map((text: string, index) => (
+            <ListItem disablePadding key={index}>
               <ListItemButton>
                 <ListItemText primary={text} />
               </ListItemButton>
