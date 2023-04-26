@@ -39,6 +39,6 @@ jobs:
           context: .
           file: Dockerfile.backend
           push: true
-          tags: ${{ secrets.IMAGE_REPO }}/${{ secrets.REGISTRY_USERNAME }}/app-backend-${{ github.ref_head }}:latest
+          tags: ${{ secrets.IMAGE_REPO }}/${{ secrets.REGISTRY_USERNAME }}/app-backend-${{ github.ref_name }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
