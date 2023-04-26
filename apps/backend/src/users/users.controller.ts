@@ -17,11 +17,7 @@ export class UsersController {
   @Get('/me')
   @UseGuards(JwtAuthGuard)
   async getCurrentUser(@User() user: JWTPayload): Promise<UserDto> {
-    return {
-      id: user.userID,
-      name: user.name,
-      profileImage: user.picture,
-    };
+    return await this.usersService.getUserById(user.userID);
   }
 
   @Put('/me')
