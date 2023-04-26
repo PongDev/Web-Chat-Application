@@ -1,12 +1,14 @@
 import { PartialType, PickType } from "@nestjs/swagger";
-import { IsOptional, IsString } from "class-validator";
+import { IsOptional, IsString, IsUrl } from "class-validator";
 
 export class UserDto {
   @IsString()
   id: string;
+
   @IsString()
   name: string;
-  @IsString()
+
+  @IsUrl()
   @IsOptional()
   profileImage: string;
 }
