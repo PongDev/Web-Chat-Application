@@ -18,6 +18,8 @@
     "paths": {
       "@/*": ["./src/*"]
     },
+    "strictPropertyInitialization": false,
+    "experimentalDecorators": true,
     "types": ["google.accounts"]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
