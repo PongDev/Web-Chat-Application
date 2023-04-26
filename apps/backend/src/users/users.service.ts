@@ -32,4 +32,17 @@ export class UsersService {
       },
     });
   }
+
+  async getUserById(userID: string): Promise<UserDto> {
+    return await this.prismaService.user.findUnique({
+      where: {
+        id: userID,
+      },
+      select: {
+        id: true,
+        name: true,
+        profileImage: true,
+      },
+    });
+  }
 }
