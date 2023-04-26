@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   IconButton,
   Stack,
@@ -13,6 +14,7 @@ import { IMessage } from "./types";
 import Message from "./message";
 import { useUser } from "@/context/AuthContext";
 import axios from "axios";
+import { NavBar } from "../navigationBar/navigationbar";
 const roomName = "network chat";
 const ChatWindow = () => {
   const [message, setMessage] = useState("");
@@ -69,68 +71,78 @@ const ChatWindow = () => {
       fetchMore();
       setIsBottom(false);
     }
-  }, [isBottom, prevId]);
+  }, [isBottom]);
   useEffect(() => {
     if (
       messageListRef.current &&
       messageListRef.current.scrollHeight > scrollHeight
     ) {
-      console.log("b", messageListRef.current!.scrollTop);
       messageListRef.current.scrollTop =
         messageListRef.current.scrollHeight - scrollHeight;
-      console.log("a", messageListRef.current!.scrollTop);
       setScrollHeight(messageListRef.current!.scrollHeight);
     }
     if (messages[0]) setPrevId(messages[0].messageId);
   }, [messages]);
-
   return (
-    <Stack
-      direction="column"
-      padding={8}
-      spacing={5}
-      justifyContent="space-between"
-    >
-      <Typography variant="h4" align="center">
-        {roomName}
-      </Typography>
+    <Box sx={{ display: "flex" }}>
+      <NavBar />
       <Stack
         direction="column"
-        spacing={2}
-        ref={messageListRef}
-        sx={{ maxHeight: "65vh", overflow: "auto" }}
+        paddingY={6}
+        paddingX={12}
+        spacing={5}
+        justifyContent="space-between"
+        minHeight="100vh"
+        width="100%"
       >
-        <div id="top-sentinel" style={{ height: "1px" }} />
-        {messages.map((message: IMessage) => (
-          <Message
-            ownMessage={message.userId === "1" ? true : false}
-            message={message}
-            key={message.messageId}
-          ></Message>
-        ))}
-      </Stack>
-      <Stack direction="row" spacing={2} alignItems="center">
-        <IconButton
-          aria-label="more button"
-          size="large"
-          onClick={handleClickMore}
+        <Typography variant="h4" align="center">
+          {roomName}
+        </Typography>
+        <Stack
+          direction="column"
+          spacing={2}
+          ref={messageListRef}
+          sx={{ maxHeight: "65vh", minHeight: "65vh", overflow: "auto" }}
         >
-          <AddCircleOutlineIcon fontSize="large" />
-        </IconButton>
-        <TextField
-          label="Type your message"
-          variant="outlined"
-          fullWidth
-          multiline
-          maxRows={4}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
-        <IconButton aria-label="send button" size="large" onClick={handleSend}>
-          <SendIcon fontSize="large" />
-        </IconButton>
+          <div
+            id="top-sentinel"
+            style={{ marginTop: "auto !important", height: "1px" }}
+          />
+          {messages.map((message: IMessage) => (
+            <Message
+              ownMessage={message.userId === "1" ? true : false}
+              message={message}
+              key={message.messageId}
+            ></Message>
+          ))}
+        </Stack>
+        <Stack direction="row" spacing={2} alignItems="center">
+          <IconButton
+            aria-label="more button"
+            size="large"
+            onClick={handleClickMore}
+          >
+            <AddCircleOutlineIcon fontSize="large" />
+          </IconButton>
+          <TextField
+            label="Type your message"
+            variant="outlined"
+            fullWidth
+            multiline
+            maxRows={4}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+          <IconButton
+            aria-label="send button"
+            size="large"
+            onClick={handleSend}
+          >
+            <SendIcon fontSize="large" />
+          </IconButton>
+        </Stack>
       </Stack>
-    </Stack>
+    </Box>
   );
 };
 export default ChatWindow;
