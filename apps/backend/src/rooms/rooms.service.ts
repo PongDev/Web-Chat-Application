@@ -33,6 +33,13 @@ export class RoomsService {
         },
       });
 
+      await tx.groupRoomUser.create({
+        data: {
+          roomId: newGroupRoom.id,
+          userId,
+        },
+      });
+
       return {
         id: newGroupRoom.id,
       };
@@ -134,6 +141,39 @@ export class RoomsService {
       id: room.roomId,
       name: room.groupRoom.name,
     }));
+  }
+
+  async checkJoinedRoom(userId: string, roomId: string): Promise<boolean> {
+    const room = await this.prismaService.room.findFirst({
+      where: {
+        id: roomId,
+        OR: [
+          {
+            GroupRoom: {
+              GroupRoomUser: {
+                some: {
+                  userId,
+                },
+              },
+            },
+          },
+          {
+            privateRoom: {
+              OR: [
+                {
+                  member1: userId,
+                },
+                {
+                  member2: userId,
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+
+    return !!room;
   }
 
   async getAllRooms(

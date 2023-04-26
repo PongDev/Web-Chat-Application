@@ -7,9 +7,10 @@ import { AuthService } from './auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { UsersModule } from './users/users.module';
 import { RoomsModule } from './rooms/rooms.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
-  imports: [AuthModule, RoomsModule, UsersModule],
+  imports: [AuthModule, RoomsModule, UsersModule, MessagesModule],
   controllers: [AppController],
   providers: [AppService, JwtService, PrismaService, AuthService],
 })
