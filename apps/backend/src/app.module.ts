@@ -10,9 +10,17 @@ import { RoomsModule } from './rooms/rooms.module';
 import { MessagesModule } from './messages/messages.module';
 import { SocketService } from './socket/socket.service';
 import { SocketModule } from './socket/socket.module';
+import { VerifierModule } from './verifier/verifier.module';
 
 @Module({
-  imports: [AuthModule, RoomsModule, UsersModule, MessagesModule, SocketModule],
+  imports: [
+    AuthModule,
+    RoomsModule,
+    UsersModule,
+    MessagesModule,
+    SocketModule,
+    VerifierModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,
