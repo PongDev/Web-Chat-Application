@@ -67,7 +67,7 @@ const ChatWindow = () => {
   }, []);
 
   useEffect(() => {
-    if (isBottom && prevId != "1") {
+    if (isBottom && prevId !== "1") {
       fetchMore();
       setIsBottom(false);
     }
