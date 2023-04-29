@@ -23,6 +23,7 @@ export type BackendConfig = {
     enable: boolean;
     prefixPath: string;
   };
+  socketBaseUrl: string;
   //   graphql: {
   //     debug: boolean;
   //     playground: boolean;
@@ -52,4 +53,5 @@ export const loadBackendConfig = (): BackendConfig => ({
     enable: process.env.BACKEND_SWAGGER_ENABLE === "true",
     prefixPath: process.env.BACKEND_SWAGGER_PREFIX_PATH ?? "api",
   },
+  socketBaseUrl: process.env.SOCKET_BASE_URL ?? "",
 });

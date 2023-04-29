@@ -1,5 +1,13 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsString, ValidateNested } from "class-validator";
+import {
+  IsBoolean,
+  IsEmpty,
+  IsEnum,
+  IsNotEmpty,
+  IsString,
+  ValidateNested,
+} from "class-validator";
 
 export enum RoomType {
   DIRECT_MESSAGE_ROOM = "DIRECT_MESSAGE_ROOM",
@@ -7,21 +15,35 @@ export enum RoomType {
 }
 
 export class CreateRoomTypeDto {
+  @ApiProperty({
+    type: () => String,
+    required: true,
+    description: "The type of the room to be created",
+    enum: RoomType,
+  })
+  @IsEnum(RoomType)
   type: RoomType;
 }
 
 export class CreateDMRoomBodyDto {
   type: RoomType.DIRECT_MESSAGE_ROOM;
-
-  @IsString()
-  userID: string;
 }
 
 export class CreateGroupRoomBodyDto {
   type: RoomType.GROUP_ROOM;
 
+  @ApiProperty({ type: () => String, required: true })
   @IsString()
+  @IsNotEmpty()
   name: string;
+
+  @ApiProperty({ type: () => Boolean })
+  @IsBoolean()
+  isJoinable?: boolean;
+
+  @ApiProperty({ type: () => String })
+  @IsString()
+  password?: string;
 }
 
 export class CreateRoomDto {
@@ -42,31 +64,56 @@ export class CreateRoomDto {
   body: CreateGroupRoomBodyDto | CreateDMRoomBodyDto;
 }
 
-export interface RoomInfoDto {
+export class RoomInfoDto {
+  @ApiProperty({ type: () => String, required: true })
+  @IsString()
+  @IsNotEmpty()
+  id: string;
+
+  @ApiProperty({ type: () => String, required: true })
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @ApiProperty({ type: () => RoomType, required: true })
+  @IsEnum(RoomType)
+  @IsNotEmpty()
+  type: RoomType;
+
+  @ApiProperty({ type: () => Boolean })
+  @IsBoolean()
+  isJoinable?: boolean;
+
+  @ApiProperty({ type: () => String })
+  @IsString()
+  password?: string;
+}
+
+export class CreateRoomResultDto {
+  @ApiProperty({ type: () => String, required: true })
+  @IsString()
+  @IsNotEmpty()
+  id: string;
+}
+
+export class JoinGroupResultDto {
+  @ApiProperty({ type: () => String, required: true })
+  @IsString()
+  @IsNotEmpty()
+  id: string;
+}
+
+export class JoinedRoomDetailsDto {
   id: string;
   name: string;
-  channelId: string;
 }
 
-export interface CreateRoomResultDto {
-  id: string;
-}
-
-export interface JoinGroupResultDto {
-  id: string;
-}
-
-export interface JoinedRoomDetailsDto {
-  id: string;
-  name: string;
-}
-
-export interface RoomBriefDetailsDto extends JoinedRoomDetailsDto {
+export class RoomBriefDetailsDto extends JoinedRoomDetailsDto {
   owner: string;
   userCount: number;
 }
 
-export interface JoinedRoomsDto {
+export class JoinedRoomsDto {
   directRoom: JoinedRoomDetailsDto[];
   groupRoom: JoinedRoomDetailsDto[];
 }
