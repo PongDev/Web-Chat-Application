@@ -14,9 +14,15 @@ export class SocketService {
   }
 
   async initializeSocketChannel() {
-    const rooms = await this.prismaService.room.findMany();
+    const roomsID = (
+      await this.prismaService.room.findMany({
+        select: {
+          id: true,
+        },
+      })
+    ).map((room) => room.id);
 
-    for (const channelId of rooms.map((room) => room.id)) {
+    for (const channelId of roomsID) {
       await this.createSocketChannelWithId(channelId);
     }
   }
