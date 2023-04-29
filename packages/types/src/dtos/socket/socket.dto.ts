@@ -17,3 +17,21 @@ export class HandleMessageResponse {
 export class HandleMessageRequest {
   content: string;
 }
+
+export enum SocketMessageType {
+  SocketMessageTypeCloseChannel = "CLOSE_CHANNEL",
+  SocketMessageTypeACK = "ACK",
+  SocketMessageTypeError = "ERROR",
+  SocketMessageTypeJoin = "JOIN",
+  SocketMessageTypeLeave = "LEAVE",
+  SocketMessageTypeUnauthorized = "UNAUTHORIZED",
+  SocketMessageTypeMessage = "MESSAGE",
+  SocketMessageTypeBroadcast = "BROADCAST",
+}
+
+export class SocketMessageDTO {
+  type: SocketMessageType;
+  channelId: string;
+  message: string;
+  token: string;
+}
