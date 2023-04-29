@@ -1,3 +1,5 @@
+import { PickType } from "@nestjs/swagger";
+
 export class CreateChannelResponse {
   channelId: string;
 }
@@ -34,4 +36,13 @@ export class SocketMessageDTO {
   channelId: string;
   message: string;
   token: string;
+}
+
+export class VerifierRequestDTO extends PickType(SocketMessageDTO, [
+  "type",
+  "channelId",
+]) {}
+
+export class VerifierResponseDTO {
+  valid: boolean;
 }
