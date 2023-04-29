@@ -22,26 +22,23 @@ export class RoomsService {
   ): Promise<CreateRoomResultDto> {
     return await this.prismaService.$transaction(async (tx) => {
       const newRoom = await tx.room.create({
-        data: {},
-      });
-
-      const newGroupRoom = await tx.groupRoom.create({
         data: {
-          id: newRoom.id,
-          name,
+          type: RoomType.GROUP,
           owner: userId,
+          name,
+          isJoinable: true,
         },
       });
 
-      await tx.groupRoomUser.create({
+      await tx.userRoomMember.create({
         data: {
-          roomId: newGroupRoom.id,
+          roomId: newRoom.id,
           userId,
         },
       });
 
       return {
-        id: newGroupRoom.id,
+        id: newRoom.id,
       };
     });
   }
@@ -60,25 +57,39 @@ export class RoomsService {
     }
 
     return await this.prismaService.$transaction(async (tx) => {
-      const room = await tx.directMessageRoom.findFirst({
+      const room = await tx.room.findFirst({
         where: {
-          member1: userId1,
-          member2: userId2,
+          type: RoomType.DIRECT,
+          UserRoomMember: {
+            every: {
+              userId: {
+                in: [userId1, userId2],
+              },
+            },
+          },
         },
       });
 
       let roomId = room?.id;
       if (!roomId) {
         const newRoom = await tx.room.create({
-          data: {},
+          data: {
+            type: RoomType.DIRECT,
+            isJoinable: false,
+          },
         });
 
-        await tx.directMessageRoom.create({
-          data: {
-            id: newRoom.id,
-            member1: userId1,
-            member2: userId2,
-          },
+        await tx.userRoomMember.createMany({
+          data: [
+            {
+              roomId: newRoom.id,
+              userId: userId1,
+            },
+            {
+              roomId: newRoom.id,
+              userId: userId2,
+            },
+          ],
         });
 
         roomId = newRoom.id;
@@ -93,83 +104,65 @@ export class RoomsService {
   private async getJoinedDMRoom(
     userId: string,
   ): Promise<JoinedRoomDetailsDto[]> {
-    const DMRoom = await this.prismaService.directMessageRoom.findMany({
+    const DMRoom = await this.prismaService.room.findMany({
       where: {
-        OR: [
-          {
-            member1: userId,
+        type: RoomType.DIRECT,
+        UserRoomMember: {
+          some: {
+            userId,
           },
-          {
-            member2: userId,
-          },
-        ],
+        },
       },
       select: {
         id: true,
-        member1User: true,
-        member2User: true,
+        UserRoomMember: {
+          select: {
+            User: true,
+          },
+        },
       },
     });
 
     return DMRoom.map((room) => ({
       id: room.id,
       name:
-        room.member1User.id === userId
-          ? room.member2User.name
-          : room.member1User.name,
+        room.UserRoomMember[0].User.id === userId
+          ? room.UserRoomMember[1].User.name
+          : room.UserRoomMember[0].User.name,
     }));
   }
 
   private async getJoinedGroupRoom(
     userId: string,
   ): Promise<JoinedRoomDetailsDto[]> {
-    const groupRoom = await this.prismaService.groupRoomUser.findMany({
+    const groupRoom = await this.prismaService.userRoomMember.findMany({
       where: {
         userId,
+        Room: {
+          type: RoomType.GROUP,
+        },
       },
       select: {
-        roomId: true,
-        groupRoom: {
+        Room: {
           select: {
             name: true,
+            id: true,
           },
         },
       },
     });
 
     return groupRoom.map((room) => ({
-      id: room.roomId,
-      name: room.groupRoom.name,
+      id: room.Room.id,
+      name: room.Room.name,
     }));
   }
 
   async checkJoinedRoom(userId: string, roomId: string): Promise<boolean> {
-    const room = await this.prismaService.room.findFirst({
+    const room = await this.prismaService.userRoomMember.findFirst({
       where: {
-        id: roomId,
-        OR: [
-          {
-            GroupRoom: {
-              GroupRoomUser: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          },
-          {
-            privateRoom: {
-              OR: [
-                {
-                  member1: userId,
-                },
-                {
-                  member2: userId,
-                },
-              ],
-            },
-          },
-        ],
+        roomId,
+        userId,
       },
     });
 
@@ -183,24 +176,21 @@ export class RoomsService {
     if (!page) page = 1;
     if (!limit) limit = 10;
 
-    const rooms = await this.prismaService.groupRoom.findMany({
-      select: {
-        id: true,
-        name: true,
-        ownerUser: {
-          select: {
-            name: true,
-          },
-        },
-        GroupRoomUser: true,
+    const rooms = await this.prismaService.room.findMany({
+      where: {
+        type: RoomType.GROUP,
+      },
+      include: {
+        OwnerUser: true,
+        UserRoomMember: true,
       },
     });
 
     return rooms.map((room) => ({
       id: room.id,
       name: room.name,
-      owner: room.ownerUser.name,
-      userCount: room.GroupRoomUser.length,
+      owner: room.OwnerUser.name,
+      userCount: room.UserRoomMember.length,
     }));
   }
 
@@ -208,18 +198,20 @@ export class RoomsService {
     body: CreateGroupRoomBodyDto | CreateDMRoomBodyDto,
     userId: string,
   ): Promise<CreateRoomResultDto> {
-    if (body.type === RoomType.GROUP_ROOM) {
-      return await this.createNewGroupRoom(body.name, userId);
+    if (body.type === RoomType.GROUP) {
+      const _body = body as CreateGroupRoomBodyDto;
+      return await this.createNewGroupRoom(_body.name, userId);
     }
-    if (body.type === RoomType.DIRECT_MESSAGE_ROOM) {
-      return await this.createNewDMRoom(userId, body.userID);
+    if (body.type === RoomType.DIRECT) {
+      const _body = body as CreateDMRoomBodyDto;
+      return await this.createNewDMRoom(userId, _body.userId);
     }
 
     throw new BadRequestException('Invalid room type');
   }
 
   async getCreatedRooms(userId: string): Promise<JoinedRoomDetailsDto[]> {
-    const rooms = await this.prismaService.groupRoom.findMany({
+    const rooms = await this.prismaService.room.findMany({
       where: {
         owner: userId,
       },
@@ -243,18 +235,19 @@ export class RoomsService {
   }
 
   async joinGroupRoom(
-    roomId: string,
     userId: string,
+    roomId: string,
   ): Promise<JoinGroupResultDto> {
-    const room = await this.prismaService.groupRoom.findFirst({
+    const room = await this.prismaService.room.findFirst({
       where: {
         id: roomId,
+        type: RoomType.GROUP,
       },
     });
 
     if (!room) throw new BadRequestException('Group Room not found');
 
-    await this.prismaService.groupRoomUser.upsert({
+    await this.prismaService.userRoomMember.upsert({
       where: {
         userId_roomId: {
           userId,
@@ -278,56 +271,33 @@ export class RoomsService {
       where: {
         id: roomId,
       },
-      select: {
-        channelId: true,
-        GroupRoom: true,
-        privateRoom: true,
+      include: {
+        UserRoomMember: {
+          include: {
+            User: true,
+          },
+        },
       },
     });
 
     let name = '';
 
     if (!room) throw new BadRequestException('Room not found');
-    if (room.GroupRoom) {
-      const groupRoom = await this.prismaService.groupRoom.findFirst({
-        where: {
-          id: roomId,
-        },
-        select: {
-          name: true,
-          ownerUser: {
-            select: {
-              name: true,
-            },
-          },
-          GroupRoomUser: true,
-        },
-      });
-
-      name = groupRoom.name;
+    if (room.type === RoomType.GROUP) {
+      name = room.name;
     }
 
-    if (room.privateRoom) {
-      const privateRoom = await this.prismaService.directMessageRoom.findFirst({
-        where: {
-          id: roomId,
-        },
-        select: {
-          member1User: true,
-          member2User: true,
-        },
-      });
-
+    if (room.type === RoomType.DIRECT) {
       name =
-        privateRoom.member1User.id === userId
-          ? privateRoom.member2User.name
-          : privateRoom.member1User.name;
+        room.UserRoomMember[0].User.id === userId
+          ? room.UserRoomMember[1].User.name
+          : room.UserRoomMember[0].User.name;
     }
 
     return {
+      type: room.type,
       id: roomId,
       name,
-      channelId: room.channelId,
     };
   }
 }
