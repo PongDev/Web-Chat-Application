@@ -11,11 +11,14 @@ import { MessagesService } from './messages.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
 import { JWTPayload, CreateMessageDto } from 'types';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Messages')
 @Controller('messages')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
+  @ApiBearerAuth()
   @Get('/:roomId')
   @UseGuards(JwtAuthGuard)
   async getMessagesByRoomId(
@@ -32,6 +35,7 @@ export class MessagesController {
     );
   }
 
+  @ApiBearerAuth()
   @Post('/:roomId')
   @UseGuards(JwtAuthGuard)
   async createMessage(
