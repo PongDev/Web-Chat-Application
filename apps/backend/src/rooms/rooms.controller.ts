@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
@@ -38,7 +46,7 @@ export class RoomsController {
   @ApiBearerAuth()
   @Post('/group/join/:roomId')
   @UseGuards(JwtAuthGuard)
-  async joinRoom(@User() user: JWTPayload, @Query('roomId') roomId: string) {
+  async joinRoom(@User() user: JWTPayload, @Param('roomId') roomId: string) {
     return this.roomsService.joinGroupRoom(user.userID, roomId);
   }
 

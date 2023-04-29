@@ -2,18 +2,15 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import {
   IsBoolean,
-  IsEmpty,
   IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsString,
   ValidateNested,
 } from "class-validator";
+import { RoomType } from "database";
 
-export enum RoomType {
-  DIRECT_MESSAGE_ROOM = "DIRECT_MESSAGE_ROOM",
-  GROUP_ROOM = "GROUP_ROOM",
-}
-
+export { RoomType };
 export class CreateRoomTypeDto {
   @ApiProperty({
     type: () => String,
@@ -26,11 +23,16 @@ export class CreateRoomTypeDto {
 }
 
 export class CreateDMRoomBodyDto {
-  type: RoomType.DIRECT_MESSAGE_ROOM;
+  type: RoomType;
+
+  @ApiProperty({ type: () => String, required: true })
+  @IsString()
+  @IsNotEmpty()
+  userId: string;
 }
 
 export class CreateGroupRoomBodyDto {
-  type: RoomType.GROUP_ROOM;
+  type: RoomType;
 
   @ApiProperty({ type: () => String, required: true })
   @IsString()
@@ -39,10 +41,12 @@ export class CreateGroupRoomBodyDto {
 
   @ApiProperty({ type: () => Boolean })
   @IsBoolean()
+  @IsOptional()
   isJoinable?: boolean;
 
   @ApiProperty({ type: () => String })
   @IsString()
+  @IsOptional()
   password?: string;
 }
 
@@ -54,9 +58,9 @@ export class CreateRoomDto {
       subTypes: [
         {
           value: CreateDMRoomBodyDto,
-          name: RoomType.DIRECT_MESSAGE_ROOM,
+          name: RoomType.DIRECT,
         },
-        { value: CreateGroupRoomBodyDto, name: RoomType.GROUP_ROOM },
+        { value: CreateGroupRoomBodyDto, name: RoomType.GROUP },
       ],
     },
     keepDiscriminatorProperty: true,
@@ -82,10 +86,12 @@ export class RoomInfoDto {
 
   @ApiProperty({ type: () => Boolean })
   @IsBoolean()
+  @IsOptional()
   isJoinable?: boolean;
 
   @ApiProperty({ type: () => String })
   @IsString()
+  @IsOptional()
   password?: string;
 }
 
