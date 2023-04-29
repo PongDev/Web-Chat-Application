@@ -30,13 +30,14 @@ model User {
 
 model Room {
   id         String   @id @default(cuid())
+  name       String?
   createdAt  DateTime @default(now())
   type       RoomType
   isJoinable Boolean  @default(false)
   password   String?
-  owner      String
+  owner      String?
 
-  OwnerUser      User             @relation(fields: [owner], references: [id])
+  OwnerUser      User?            @relation(fields: [owner], references: [id])
   UserRoomMember UserRoomMember[]
   Message        Message[]
 }
