@@ -10,60 +10,45 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Add dummy models to make the schema valid
+enum RoomType {
+  DIRECT
+  GROUP
+}
+
 model User {
-  id                 String              @id @default(cuid())
-  gid                String              @unique
-  email              String
-  name               String?
-  profileImage       String?
-  createdAt          DateTime            @default(now())
-  PrivateRoomMember1 DirectMessageRoom[] @relation("member1_user")
-  PrivateRoomMember2 DirectMessageRoom[] @relation("member2_user")
-  GroupRoomId        String?
-  GroupRoom          GroupRoom[]
-  Message            Message[]
-  GroupRoomUser      GroupRoomUser[]
+  id           String   @id @default(cuid())
+  gid          String   @unique
+  email        String
+  name         String?
+  profileImage String?
+  createdAt    DateTime @default(now())
+
+  RoomOwn    Room[]
+  RoomMember UserRoomMember[]
+  Message    Message[]
 }
 
 model Room {
-  id          String             @id @default(cuid())
-  channelId   String?
-  privateRoom DirectMessageRoom?
-  GroupRoom   GroupRoom?
-  Message     Message[]
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  type       RoomType
+  isJoinable Boolean  @default(false)
+  password   String?
+  owner      String
+
+  OwnerUser      User             @relation(fields: [owner], references: [id])
+  UserRoomMember UserRoomMember[]
+  Message        Message[]
 }
 
-model DirectMessageRoom {
-  id      String @id @unique @default(cuid())
-  member1 String
-  member2 String
-
-  member1User User @relation("member1_user", fields: [member1], references: [id])
-  member2User User @relation("member2_user", fields: [member2], references: [id])
-  Room        Room @relation(fields: [id], references: [id])
-
-  @@unique([member1, member2])
-}
-
-model GroupRoom {
-  id    String @id @unique @default(cuid())
-  name  String
-  owner String
-
-  room          Room            @relation(fields: [id], references: [id])
-  ownerUser     User            @relation(fields: [owner], references: [id])
-  GroupRoomUser GroupRoomUser[]
-}
-
-model GroupRoomUser {
+model UserRoomMember {
   userId String
   roomId String
 
-  user      User      @relation(fields: [userId], references: [id])
-  groupRoom GroupRoom @relation(fields: [roomId], references: [id])
+  User User @relation(fields: [userId], references: [id])
+  Room Room @relation(fields: [roomId], references: [id])
 
-  @@unique([userId, roomId])
+  @@id([userId, roomId])
 }
 
 model Message {
