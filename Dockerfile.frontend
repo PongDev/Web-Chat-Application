@@ -18,6 +18,11 @@ RUN pnpm install --frozen-lockfile
 
 COPY --from=pruner /app/prune/frontend/full/ .
 RUN pnpm install --frozen-lockfile
+
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_SOCKET_BASE_URL
+
 RUN pnpm run build
 RUN pnpm pkg set scripts.prepare="echo no-prepare"
 RUN pnpm prune --prod
