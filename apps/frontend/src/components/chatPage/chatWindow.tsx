@@ -1,5 +1,5 @@
 import { IconButton, Stack, TextField, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import SendIcon from "@mui/icons-material/Send";
 import { IMessage } from "./types";
@@ -25,17 +25,27 @@ const ChatWindow = () => {
     console.log("more stuff");
   };
   const { messageListRef, messages } = useLoadMessages();
-
+  const webSocket = useRef<WebSocketAPI | null>(null);
   useEffect(() => {
     if (router.isReady) {
       apiClient.post(`rooms/group/join/${router.query.id}`);
-      WebSocketAPI.getInstance().send({
-        type: SocketMessageType.SocketMessageTypeJoin,
-        channelId: router.query.id as string,
-        token: localStorage.getItem("accessToken") || "",
+      webSocket.current = WebSocketAPI.getInstance();
+      webSocket.current?.getSocket().addEventListener("open", (event) => {
+        console.log("WebSocket connection opened.");
+        console.log(localStorage.getItem("accessToken"));
+        webSocket.current?.send({
+          type: SocketMessageType.SocketMessageTypeJoin,
+          channelId: router.query.id as string,
+          message: "",
+          token: localStorage.getItem("accessToken") || "",
+        });
+      });
+      webSocket.current?.getSocket().addEventListener("message", (event) => {
+        console.log(event.data);
       });
     }
   }, [router]);
+
   return (
     <Stack
       direction="column"
