@@ -1,6 +1,6 @@
 import { SocketMessageDTO, SocketMessageType } from "types";
 
-class WebSocketAPI {
+export class WebSocketAPI {
   private static instance: WebSocketAPI;
   private socket: WebSocket;
   private eventHandlers: {
@@ -52,7 +52,7 @@ class WebSocketAPI {
           this.eventHandlers.unauthorized(data.channelId);
           break;
         case SocketMessageType.SocketMessageTypeMessage:
-          this.eventHandlers.message(data.channelId, data.message);
+          this.eventHandlers.message(data.channelId, data.message ?? "");
           break;
         case SocketMessageType.SocketMessageTypeBroadcast:
           this.eventHandlers.broadcast();

@@ -1,30 +1,20 @@
-import {
-  Box,
-  Button,
-  IconButton,
-  Stack,
-  TextField,
-  Typography,
-  styled,
-} from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
+import { IconButton, Stack, TextField, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import SendIcon from "@mui/icons-material/Send";
 import { IMessage } from "./types";
 import Message from "./message";
 import { useUser } from "@/context/AuthContext";
-import axios from "axios";
-import { NavBar } from "../navigationBar/navigationbar";
+import useLoadMessages from "@/hooks/useLoadMessages";
+import apiClient from "@/config/axios";
+import { useRouter } from "next/router";
+import { WebSocketAPI } from "@/utility/socket";
+import { SocketMessageType } from "types";
 const roomName = "network chat";
 const ChatWindow = () => {
-  const [message, setMessage] = useState("");
+  const router = useRouter();
   const user = useUser();
-  const [messages, setMessages] = useState<IMessage[]>([]);
-  const observer = useRef<IntersectionObserver | null>(null);
-  const [isBottom, setIsBottom] = useState<boolean>(false);
-  const messageListRef = useRef<HTMLDivElement>(null);
-  const [scrollHeight, setScrollHeight] = useState(0);
-  const [prevId, setPrevId] = useState("11");
+  const [message, setMessage] = useState("");
   const handleSend = () => {
     setMessage("");
     console.log("sent");
@@ -34,115 +24,71 @@ const ChatWindow = () => {
   const handleClickMore = () => {
     console.log("more stuff");
   };
-  const fetchMore = async () => {
-    try {
-      const response = await axios.get(
-        `url/messages/1?prevmessageId=${prevId}&limit=5`
-      );
-      setMessages([...response.data.messages, ...messages]);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  useEffect(() => {
-    messageListRef.current!.scrollTop = messageListRef.current!.scrollHeight;
-    observer.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsBottom(true);
-          } else {
-            setIsBottom(false);
-          }
-        });
-      },
-      { threshold: 1 }
-    );
-    observer.current.observe(document.getElementById("top-sentinel")!);
-    return () => {
-      if (observer.current) {
-        observer.current.disconnect();
-      }
-    };
-  }, []);
+  const { messageListRef, messages } = useLoadMessages();
 
   useEffect(() => {
-    if (isBottom && prevId !== "1") {
-      fetchMore();
-      setIsBottom(false);
+    if (router.isReady) {
+      apiClient.post(`rooms/group/join/${router.query.id}`);
+      WebSocketAPI.getInstance().send({
+        type: SocketMessageType.SocketMessageTypeJoin,
+        channelId: router.query.id as string,
+        token: localStorage.getItem("accessToken") || "",
+      });
     }
-  }, [isBottom]);
-  useEffect(() => {
-    if (
-      messageListRef.current &&
-      messageListRef.current.scrollHeight > scrollHeight
-    ) {
-      messageListRef.current.scrollTop =
-        messageListRef.current.scrollHeight - scrollHeight;
-      setScrollHeight(messageListRef.current!.scrollHeight);
-    }
-    if (messages[0]) setPrevId(messages[0].messageId);
-  }, [messages]);
+  }, [router]);
   return (
-    <Box sx={{ display: "flex" }}>
-      <NavBar />
+    <Stack
+      direction="column"
+      paddingY={6}
+      paddingX={12}
+      spacing={5}
+      justifyContent="space-between"
+      minHeight="100vh"
+      width="100%"
+    >
+      <Typography variant="h4" align="center">
+        {roomName}
+      </Typography>
       <Stack
         direction="column"
-        paddingY={6}
-        paddingX={12}
-        spacing={5}
-        justifyContent="space-between"
-        minHeight="100vh"
-        width="100%"
+        spacing={2}
+        ref={messageListRef}
+        sx={{ maxHeight: "65vh", minHeight: "65vh", overflow: "auto" }}
       >
-        <Typography variant="h4" align="center">
-          {roomName}
-        </Typography>
-        <Stack
-          direction="column"
-          spacing={2}
-          ref={messageListRef}
-          sx={{ maxHeight: "65vh", minHeight: "65vh", overflow: "auto" }}
-        >
-          <div
-            id="top-sentinel"
-            style={{ marginTop: "auto !important", height: "1px" }}
-          />
-          {messages.map((message: IMessage) => (
-            <Message
-              ownMessage={message.userId === "1" ? true : false}
-              message={message}
-              key={message.messageId}
-            ></Message>
-          ))}
-        </Stack>
-        <Stack direction="row" spacing={2} alignItems="center">
-          <IconButton
-            aria-label="more button"
-            size="large"
-            onClick={handleClickMore}
-          >
-            <AddCircleOutlineIcon fontSize="large" />
-          </IconButton>
-          <TextField
-            label="Type your message"
-            variant="outlined"
-            fullWidth
-            multiline
-            maxRows={4}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-          />
-          <IconButton
-            aria-label="send button"
-            size="large"
-            onClick={handleSend}
-          >
-            <SendIcon fontSize="large" />
-          </IconButton>
-        </Stack>
+        <div
+          id="top-sentinel"
+          style={{ marginTop: "auto !important", height: "1px" }}
+        />
+        {messages.map((message: IMessage) => (
+          <Message
+            ownMessage={message.userId === "1" ? true : false}
+            message={message}
+            key={message.messageId}
+          ></Message>
+        ))}
       </Stack>
-    </Box>
+      <Stack direction="row" spacing={2} alignItems="center">
+        <IconButton
+          aria-label="more button"
+          size="large"
+          onClick={handleClickMore}
+        >
+          <AddCircleOutlineIcon fontSize="large" />
+        </IconButton>
+        <TextField
+          label="Type your message"
+          variant="outlined"
+          fullWidth
+          multiline
+          maxRows={4}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+        />
+        <IconButton aria-label="send button" size="large" onClick={handleSend}>
+          <SendIcon fontSize="large" />
+        </IconButton>
+      </Stack>
+    </Stack>
   );
 };
 export default ChatWindow;

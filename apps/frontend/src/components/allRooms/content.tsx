@@ -10,38 +10,41 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RoomBox from "./roomBox";
 import useCreateRoomDialog from "@/hooks/useCreateRoomDialog";
+import apiClient from "@/config/axios";
 interface IRoom {
-  roomId: string;
-  currentUser: number;
-  roomName: string;
+  id: string;
+  userCount: number;
+  name: string;
+  owner: string;
 }
-const cards: IRoom[] = [
-  { roomId: "1", currentUser: 8, roomName: "aaaaaaaaaaa" },
-  {
-    roomId: "2",
-    currentUser: 38,
-    roomName: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbcsdsds",
-  },
-  { roomId: "3", currentUser: 2, roomName: "cccc" },
-  { roomId: "4", currentUser: 6, roomName: "d" },
-  { roomId: "5", currentUser: 7, roomName: "eeeeeeeeeeeeeeeeeeee" },
-  { roomId: "6", currentUser: 1, roomName: "ภาษาไทย" },
-  { roomId: "7", currentUser: 15, roomName: "9595959efsffs" },
-];
 const Content = () => {
   const {
     open,
     newRoomName,
     submitted,
+    created,
     handleClickOpen,
     handleClose,
     handleCreate,
     setNewRoomName,
   } = useCreateRoomDialog();
+  const [cards, setCards] = useState<IRoom[]>([]);
+  const fetchRooms = async () => {
+    try {
+      const response = await apiClient.get(`rooms`);
+      console.log(response.data);
+      setCards(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  useEffect(() => {
+    fetchRooms();
+  }, [created]);
   return (
     <Box padding={8}>
       <Box sx={{ display: "flex" }} alignItems={"center"} paddingY={4}>
@@ -63,10 +66,12 @@ const Content = () => {
         sx={{ alignItems: "stretch" }}
       >
         {cards.map((room) => (
-          <Grid item xs={12} sm={6} md={4} key={room.roomId}>
+          <Grid item xs={12} sm={6} md={4} key={room.id}>
             <RoomBox
-              roomName={room.roomName}
-              currentUser={room.currentUser}
+              owner={room.owner}
+              roomName={room.name}
+              currentUser={room.userCount}
+              id={room.id}
             ></RoomBox>
           </Grid>
         ))}

@@ -35,8 +35,8 @@ export enum SocketMessageType {
 export class SocketMessageDTO {
   type: SocketMessageType;
   channelId: string;
-  message: string;
-  token: string;
+  message?: string;
+  token?: string;
 }
 
 export class VerifierRequestDTO extends PickType(SocketMessageDTO, [
