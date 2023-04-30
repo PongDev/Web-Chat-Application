@@ -36,9 +36,13 @@ jobs:
         id: set-env
         run: |
           if [ "${{ github.ref_name }}" = "main" ]; then
-            echo "BACKEND_URL=${{ secrets.MAIN_BACKEND_URL }}" >> "$GITHUB_OUTPUT"
+            echo "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.MAIN_NEXT_PUBLIC_GOOGLE_CLIENT_ID= }}" >> "$GITHUB_OUTPUT"
+            echo "NEXT_PUBLIC_API_URL=${{ secrets.MAIN_NEXT_PUBLIC_API_URL= }}" >> "$GITHUB_OUTPUT"
+            echo "NEXT_PUBLIC_SOCKET_BASE_URL=${{ secrets.MAIN_NEXT_PUBLIC_SOCKET_BASE_URL= }}" >> "$GITHUB_OUTPUT"
           elif [ "${{ github.ref_name }}" = "dev" ]; then
-            echo "BACKEND_URL=${{ secrets.DEV_BACKEND_URL }}" >> "$GITHUB_OUTPUT"
+            echo "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.DEV_NEXT_PUBLIC_GOOGLE_CLIENT_ID= }}" >> "$GITHUB_OUTPUT"
+            echo "NEXT_PUBLIC_API_URL=${{ secrets.DEV_NEXT_PUBLIC_API_URL= }}" >> "$GITHUB_OUTPUT"
+            echo "NEXT_PUBLIC_SOCKET_BASE_URL=${{ secrets.DEV_NEXT_PUBLIC_SOCKET_BASE_URL= }}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Build and push
@@ -46,7 +50,9 @@ jobs:
         with:
           context: .
           build-args: |
-            BACKEND_URL=${{ steps.set-env.outputs.BACKEND_URL }}
+            NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ steps.set-env.outputs.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
+            NEXT_PUBLIC_API_URL=${{ steps.set-env.outputs.NEXT_PUBLIC_API_URL }}
+            NEXT_PUBLIC_SOCKET_BASE_URL=${{ steps.set-env.outputs.NEXT_PUBLIC_SOCKET_BASE_URL }}
           file: Dockerfile.frontend
           push: true
           tags: ${{ secrets.IMAGE_REPO }}/${{ secrets.REGISTRY_USERNAME }}/app-frontend-${{ github.ref_name }}:latest
