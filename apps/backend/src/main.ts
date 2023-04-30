@@ -34,6 +34,9 @@ async function bootstrap() {
 
   await prismaService.enableShutdownHooks(app);
   await socketService.initializeSocketChannel();
+  setInterval(async () => {
+    await socketService.healthCheck();
+  }, config.socketHealthCheckInterval);
   await app.listen(port);
 }
 bootstrap();
