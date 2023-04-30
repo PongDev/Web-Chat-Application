@@ -24,6 +24,8 @@ export type BackendConfig = {
     prefixPath: string;
   };
   socketBaseUrl: string;
+  socketHealthCheckInterval: number;
+  socketHealthCheckChannelName: string;
   //   graphql: {
   //     debug: boolean;
   //     playground: boolean;
@@ -54,4 +56,8 @@ export const loadBackendConfig = (): BackendConfig => ({
     prefixPath: process.env.BACKEND_SWAGGER_PREFIX_PATH ?? "api",
   },
   socketBaseUrl: process.env.SOCKET_BASE_URL ?? "",
+  socketHealthCheckInterval:
+    parseInt(process.env.SOCKET_HEALTH_CHECK_INTERVAL ?? "", 10) || 5000,
+  socketHealthCheckChannelName:
+    process.env.SOCKET_HEALTH_CHECK_CHANNEL_NAME ?? "health-check",
 });
