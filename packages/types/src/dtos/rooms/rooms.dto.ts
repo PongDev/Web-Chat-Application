@@ -79,7 +79,7 @@ export class RoomInfoDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({ type: () => RoomType, required: true })
+  @ApiProperty({ type: () => String, required: true })
   @IsEnum(RoomType)
   @IsNotEmpty()
   type: RoomType;
