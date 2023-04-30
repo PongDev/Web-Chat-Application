@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { backendConfig } from 'config';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateChannelResponse, HandleMessageRequest } from 'types';
@@ -6,11 +6,23 @@ import { CreateChannelResponse, HandleMessageRequest } from 'types';
 @Injectable()
 export class SocketService {
   private readonly socketBaseUrl: string;
+  private readonly logger = new Logger(SocketService.name);
 
   constructor(private prismaService: PrismaService) {
     this.socketBaseUrl = backendConfig.socketBaseUrl.endsWith('/')
       ? backendConfig.socketBaseUrl.slice(0, -1)
       : backendConfig.socketBaseUrl;
+  }
+
+  async healthCheck() {
+    const healthCheckChannelCreated = await this.createSocketChannelWithId(
+      backendConfig.socketHealthCheckChannelName,
+    );
+
+    if (healthCheckChannelCreated) {
+      this.logger.log('Health Not Found, Initializing Socket Channel');
+      await this.initializeSocketChannel();
+    }
   }
 
   async initializeSocketChannel() {
@@ -25,6 +37,9 @@ export class SocketService {
     for (const channelId of roomsID) {
       await this.createSocketChannelWithId(channelId);
     }
+    await this.createSocketChannelWithId(
+      backendConfig.socketHealthCheckChannelName,
+    );
   }
 
   async createSocketChannel(): Promise<string> {
