@@ -10,7 +10,7 @@ import { JWTPayload, VerifierRequestDTO, VerifierResponseDTO } from 'types';
 import { VerifierService } from './verifier.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Verifier')
 @Controller('verifier')
@@ -19,6 +19,7 @@ export class VerifierController {
 
   @Post('verify')
   @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Verify the user',
