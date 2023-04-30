@@ -20,9 +20,6 @@ export class VerifierService {
         },
       },
     });
-    if (room !== null) {
-      return { valid: true };
-    }
-    return { valid: false };
+    return { valid: room !== null };
   }
 }
