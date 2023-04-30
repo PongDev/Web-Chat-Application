@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
   CreateDMRoomBodyDto,
@@ -245,7 +249,7 @@ export class RoomsService {
       },
     });
 
-    if (!room) throw new BadRequestException('Group Room not found');
+    if (!room) throw new NotFoundException('Group Room not found');
 
     await this.prismaService.userRoomMember.upsert({
       where: {
@@ -282,7 +286,7 @@ export class RoomsService {
 
     let name = '';
 
-    if (!room) throw new BadRequestException('Room not found');
+    if (!room) throw new NotFoundException('Room not found');
     if (room.type === RoomType.GROUP) {
       name = room.name;
     }
