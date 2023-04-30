@@ -51,6 +51,10 @@ export class RoomsController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid room type',
   })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Failed to create room',
+  })
   @Post()
   @UseGuards(JwtAuthGuard)
   async createNewRoom(

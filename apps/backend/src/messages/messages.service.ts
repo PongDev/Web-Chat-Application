@@ -1,6 +1,11 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RoomsService } from 'src/rooms/rooms.service';
+import { SocketService } from 'src/socket/socket.service';
 import { CreateMessageDto, GetMessagesByRoomIdResponse } from 'types';
 
 @Injectable()
@@ -8,6 +13,7 @@ export class MessagesService {
   constructor(
     private prisma: PrismaService,
     private roomsService: RoomsService,
+    private socketService: SocketService,
   ) {}
 
   async getMessagesByRoomId(
@@ -54,6 +60,16 @@ export class MessagesService {
   async createMessage(roomId: string, userId: string, body: CreateMessageDto) {
     if (!(await this.roomsService.checkJoinedRoom(userId, roomId)))
       throw new ForbiddenException('You are not a member of this room');
+
+    const result = await this.socketService.sendMessageToChannel(
+      roomId,
+      JSON.stringify(body),
+    );
+
+    if (!result)
+      throw new InternalServerErrorException(
+        "Couldn't send message to channel",
+      );
 
     await this.prisma.message.create({
       data: {

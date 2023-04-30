@@ -1,9 +1,11 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { SocketService } from 'src/socket/socket.service';
 import {
   CreateDMRoomBodyDto,
   CreateGroupRoomBodyDto,
@@ -18,7 +20,10 @@ import {
 
 @Injectable()
 export class RoomsService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private socketService: SocketService,
+  ) {}
 
   private async createNewGroupRoom(
     name: string,
@@ -40,6 +45,12 @@ export class RoomsService {
           userId,
         },
       });
+
+      const result = this.socketService.createSocketChannelWithId(newRoom.id);
+      if (!result)
+        throw new InternalServerErrorException(
+          'Failed to create socket channel',
+        );
 
       return {
         id: newRoom.id,
@@ -97,6 +108,12 @@ export class RoomsService {
         });
 
         roomId = newRoom.id;
+
+        const result = this.socketService.createSocketChannelWithId(newRoom.id);
+        if (!result)
+          throw new InternalServerErrorException(
+            'Failed to create socket channel',
+          );
       }
 
       return {
@@ -202,16 +219,17 @@ export class RoomsService {
     body: CreateGroupRoomBodyDto | CreateDMRoomBodyDto,
     userId: string,
   ): Promise<CreateRoomResultDto> {
+    let newRoom: CreateRoomResultDto = null;
+
     if (body.type === RoomType.GROUP) {
       const _body = body as CreateGroupRoomBodyDto;
-      return await this.createNewGroupRoom(_body.name, userId);
-    }
-    if (body.type === RoomType.DIRECT) {
+      newRoom = await this.createNewGroupRoom(_body.name, userId);
+    } else if (body.type === RoomType.DIRECT) {
       const _body = body as CreateDMRoomBodyDto;
-      return await this.createNewDMRoom(userId, _body.userId);
-    }
+      newRoom = await this.createNewDMRoom(userId, _body.userId);
+    } else throw new BadRequestException('Invalid room type');
 
-    throw new BadRequestException('Invalid room type');
+    return newRoom;
   }
 
   async getCreatedRooms(userId: string): Promise<JoinedRoomDetailsDto[]> {
