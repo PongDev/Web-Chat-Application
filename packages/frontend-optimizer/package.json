@@ -1,0 +1,17 @@
+{
+  "name": "frontend-optimizer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^4.9.5",
+    "tsconfig": "workspace:*"
+  }
+}

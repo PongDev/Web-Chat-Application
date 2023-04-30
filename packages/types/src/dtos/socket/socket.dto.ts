@@ -1,4 +1,5 @@
 import { PickType } from "@nestjs/swagger";
+import { IsEnum, IsOptional, IsString } from "class-validator";
 
 export class CreateChannelResponse {
   channelId: string;
@@ -33,10 +34,19 @@ export enum SocketMessageType {
 }
 
 export class SocketMessageDTO {
+  @IsEnum(SocketMessageType)
   type: SocketMessageType;
+
+  @IsString()
   channelId: string;
-  message: string;
-  token: string;
+
+  @IsString()
+  @IsOptional()
+  message?: string;
+
+  @IsString()
+  @IsOptional()
+  token?: string;
 }
 
 export class VerifierRequestDTO extends PickType(SocketMessageDTO, [
