@@ -24,6 +24,7 @@ export enum SocketMessageType {
   SocketMessageTypeCloseChannel = "CLOSE_CHANNEL",
   SocketMessageTypeACK = "ACK",
   SocketMessageTypeError = "ERROR",
+  SocketMessageTypeNotFound = "NOT_FOUND",
   SocketMessageTypeJoin = "JOIN",
   SocketMessageTypeLeave = "LEAVE",
   SocketMessageTypeUnauthorized = "UNAUTHORIZED",

@@ -5,11 +5,12 @@ class WebSocketAPI {
   private socket: WebSocket;
   private eventHandlers: {
     closeChannel: (channelId: string) => {};
-    ack: () => {};
+    ack: (channelId: string) => {};
     error: () => {};
+    notFound: (channelId: string) => {};
     join: () => {};
     leave: () => {};
-    unauthorized: () => {};
+    unauthorized: (channelId: string) => {};
     message: (channelId: string, message: string) => {};
     broadcast: () => {};
   };
@@ -34,11 +35,13 @@ class WebSocketAPI {
           this.eventHandlers.closeChannel(data.channelId);
           break;
         case SocketMessageType.SocketMessageTypeACK:
-          this.eventHandlers.ack();
+          this.eventHandlers.ack(data.channelId);
           break;
         case SocketMessageType.SocketMessageTypeError:
           this.eventHandlers.error();
           break;
+        case SocketMessageType.SocketMessageTypeNotFound:
+          this.eventHandlers.notFound(data.channelId);
         case SocketMessageType.SocketMessageTypeJoin:
           this.eventHandlers.join();
           break;
@@ -46,7 +49,7 @@ class WebSocketAPI {
           this.eventHandlers.leave();
           break;
         case SocketMessageType.SocketMessageTypeUnauthorized:
-          this.eventHandlers.unauthorized();
+          this.eventHandlers.unauthorized(data.channelId);
           break;
         case SocketMessageType.SocketMessageTypeMessage:
           this.eventHandlers.message(data.channelId, data.message);
@@ -77,12 +80,16 @@ class WebSocketAPI {
     this.eventHandlers.closeChannel = handler;
   }
 
-  public setOnACK(handler: () => {}) {
+  public setOnACK(handler: (channelId: string) => {}) {
     this.eventHandlers.ack = handler;
   }
 
   public setOnError(handler: () => {}) {
     this.eventHandlers.error = handler;
+  }
+
+  public setOnNotFound(handler: (channelId: string) => {}) {
+    this.eventHandlers.notFound = handler;
   }
 
   public setOnJoin(handler: () => {}) {
@@ -93,7 +100,7 @@ class WebSocketAPI {
     this.eventHandlers.leave = handler;
   }
 
-  public setOnUnauthorized(handler: () => {}) {
+  public setOnUnauthorized(handler: (channelId: string) => {}) {
     this.eventHandlers.unauthorized = handler;
   }
 
