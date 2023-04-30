@@ -36,13 +36,13 @@ jobs:
         id: set-env
         run: |
           if [ "${{ github.ref_name }}" = "main" ]; then
-            echo "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.MAIN_NEXT_PUBLIC_GOOGLE_CLIENT_ID= }}" >> "$GITHUB_OUTPUT"
-            echo "NEXT_PUBLIC_API_URL=${{ secrets.MAIN_NEXT_PUBLIC_API_URL= }}" >> "$GITHUB_OUTPUT"
-            echo "NEXT_PUBLIC_SOCKET_BASE_URL=${{ secrets.MAIN_NEXT_PUBLIC_SOCKET_BASE_URL= }}" >> "$GITHUB_OUTPUT"
+            echo "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.MAIN_NEXT_PUBLIC_GOOGLE_CLIENT_ID }}" >> "$GITHUB_OUTPUT"
+            echo "NEXT_PUBLIC_API_URL=${{ secrets.MAIN_NEXT_PUBLIC_API_URL }}" >> "$GITHUB_OUTPUT"
+            echo "NEXT_PUBLIC_SOCKET_BASE_URL=${{ secrets.MAIN_NEXT_PUBLIC_SOCKET_BASE_URL }}" >> "$GITHUB_OUTPUT"
           elif [ "${{ github.ref_name }}" = "dev" ]; then
-            echo "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.DEV_NEXT_PUBLIC_GOOGLE_CLIENT_ID= }}" >> "$GITHUB_OUTPUT"
-            echo "NEXT_PUBLIC_API_URL=${{ secrets.DEV_NEXT_PUBLIC_API_URL= }}" >> "$GITHUB_OUTPUT"
-            echo "NEXT_PUBLIC_SOCKET_BASE_URL=${{ secrets.DEV_NEXT_PUBLIC_SOCKET_BASE_URL= }}" >> "$GITHUB_OUTPUT"
+            echo "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.DEV_NEXT_PUBLIC_GOOGLE_CLIENT_ID }}" >> "$GITHUB_OUTPUT"
+            echo "NEXT_PUBLIC_API_URL=${{ secrets.DEV_NEXT_PUBLIC_API_URL }}" >> "$GITHUB_OUTPUT"
+            echo "NEXT_PUBLIC_SOCKET_BASE_URL=${{ secrets.DEV_NEXT_PUBLIC_SOCKET_BASE_URL }}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Build and push
