@@ -51,6 +51,9 @@ export class CreateGroupRoomBodyDto {
 }
 
 export class CreateRoomDto {
+  @ApiProperty({
+    type: () => CreateRoomTypeDto,
+  })
   @ValidateNested()
   @Type(() => CreateRoomTypeDto, {
     discriminator: {

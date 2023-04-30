@@ -1,4 +1,4 @@
-import { PickType } from "@nestjs/swagger";
+import { ApiProperty, PickType } from "@nestjs/swagger";
 import { IsEnum, IsOptional, IsString } from "class-validator";
 
 export class CreateChannelResponse {
@@ -34,16 +34,33 @@ export enum SocketMessageType {
 }
 
 export class SocketMessageDTO {
+  @ApiProperty({
+    type: () => String,
+    description: "Socket Message Type",
+    enum: SocketMessageType,
+  })
   @IsEnum(SocketMessageType)
   type: SocketMessageType;
 
+  @ApiProperty({
+    type: () => String,
+    description: "Socket Channel ID",
+  })
   @IsString()
   channelId: string;
 
+  @ApiProperty({
+    type: () => String,
+    description: "Socket Message",
+  })
   @IsString()
   @IsOptional()
   message?: string;
 
+  @ApiProperty({
+    type: () => String,
+    description: "JSON Web Token for Verification",
+  })
   @IsString()
   @IsOptional()
   token?: string;
@@ -55,5 +72,9 @@ export class VerifierRequestDTO extends PickType(SocketMessageDTO, [
 ]) {}
 
 export class VerifierResponseDTO {
+  @ApiProperty({
+    type: () => Boolean,
+    description: "Verificatopn Result",
+  })
   valid: boolean;
 }
