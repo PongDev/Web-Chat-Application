@@ -4,6 +4,7 @@ import {
   Get,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
   Query,
   UseGuards,
@@ -39,7 +40,7 @@ export class MessagesController {
   async getMessagesByRoomId(
     @Param('roomId') roomId: string,
     @Query('prevMessageId') prevMessageId: string,
-    @Query('limit') limit: string,
+    @Query('limit', ParseIntPipe) limit: string,
     @User() user: JWTPayload,
   ): Promise<GetMessagesByRoomIdResponse> {
     return await this.messagesService.getMessagesByRoomId(
@@ -58,6 +59,10 @@ export class MessagesController {
   @ApiResponse({
     status: HttpStatus.FORBIDDEN,
     description: 'Not Member of Room',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: "Couldn't send message to channel",
   })
   @Post('/:roomId')
   @UseGuards(JwtAuthGuard)
