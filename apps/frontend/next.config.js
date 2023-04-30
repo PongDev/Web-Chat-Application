@@ -1,3 +1,4 @@
+const fs = require("fs");
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -7,8 +8,8 @@ const nextConfig = {
     },
   },
   webpack: (config) => {
-    Object.assign(config.resolve.alias, {
-      "@nestjs/swagger": "frontend-optimizer",
+    config.resolve.alias = Object.assign(config.resolve.alias, {
+      "@nestjs/swagger": require.resolve("frontend-optimizer"),
     });
 
     return config;

@@ -1,3 +1,5 @@
+import "reflect-metadata";
+
 import theme, { createEmotionCache } from "@/config/theme";
 import { CacheProvider } from "@emotion/react";
 import { EmotionCache } from "@emotion/cache";
