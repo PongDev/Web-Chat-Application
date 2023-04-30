@@ -13,13 +13,12 @@ import { SocketMessageType } from "types";
 const roomName = "network chat";
 const ChatWindow = () => {
   const router = useRouter();
-  const user = useUser();
+  const { user } = useUser();
   const [message, setMessage] = useState("");
   const handleSend = () => {
+    apiClient.post(`messages/${router.query.id}`, { content: message });
     setMessage("");
     console.log("sent");
-    //   socket.emit("message", message);
-    //   setMessage("");
   };
   const handleClickMore = () => {
     console.log("more stuff");
@@ -32,7 +31,6 @@ const ChatWindow = () => {
       webSocket.current = WebSocketAPI.getInstance();
       webSocket.current?.getSocket().addEventListener("open", (event) => {
         console.log("WebSocket connection opened.");
-        console.log(localStorage.getItem("accessToken"));
         webSocket.current?.send({
           type: SocketMessageType.SocketMessageTypeJoin,
           channelId: router.query.id as string,
@@ -45,7 +43,6 @@ const ChatWindow = () => {
       });
     }
   }, [router]);
-
   return (
     <Stack
       direction="column"
@@ -71,7 +68,7 @@ const ChatWindow = () => {
         />
         {messages.map((message: IMessage) => (
           <Message
-            ownMessage={message.userId === "1" ? true : false}
+            ownMessage={message.userId === user?.id ? true : false}
             message={message}
             key={message.messageId}
           ></Message>

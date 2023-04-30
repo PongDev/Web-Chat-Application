@@ -1,5 +1,6 @@
 import { IMessage } from "@/components/chatPage/types";
-import axios from "axios";
+import apiClient from "@/config/axios";
+import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 const useLoadMessages = () => {
   const observer = useRef<IntersectionObserver | null>(null);
@@ -8,12 +9,13 @@ const useLoadMessages = () => {
   const messageListRef = useRef<HTMLDivElement>(null);
   const [scrollHeight, setScrollHeight] = useState(0);
   const [prevId, setPrevId] = useState("11");
+  const router = useRouter();
   const fetchMore = async () => {
     try {
-      const response = await axios.get(
-        `https://443031b1-b3ee-4a7d-bfd6-569b719cafa0.mock.pstmn.io/messages/1?prevmessageId=${prevId}&limit=5`
+      const response = await apiClient.get(
+        `messages/${router.query.id}?prevmessageId=${prevId}&limit=15`
       );
-      setMessages([...response.data.messages, ...messages]);
+      setMessages([...response.data, ...messages]);
     } catch (error) {
       console.error(error);
     }
@@ -41,11 +43,13 @@ const useLoadMessages = () => {
   }, []);
 
   useEffect(() => {
-    if (isBottom && prevId !== "1") {
-      fetchMore();
-      setIsBottom(false);
+    if (router.isReady) {
+      if (isBottom && prevId !== "1") {
+        fetchMore();
+        setIsBottom(false);
+      }
     }
-  }, [isBottom]);
+  }, [router, isBottom]);
   useEffect(() => {
     if (
       messageListRef.current &&
