@@ -1,41 +1,39 @@
+import apiClient from "@/config/axios";
 import { Avatar, Stack, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 interface IClient {
-  userId: string;
-  displayName: string;
+  id: string;
+  name: string;
   profileImage?: string;
 }
-const clients: IClient[] = [
-  { userId: "1", displayName: "aaaaaaaaaaa" },
-  {
-    userId: "2",
-    displayName: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbcsdsds",
-  },
-  { userId: "3", displayName: "cccc" },
-  { userId: "4", displayName: "d" },
-  { userId: "5", displayName: "eeeeeeeeeeeeeeeeeeee" },
-  { userId: "6", displayName: "ภาษาไทย" },
-  { userId: "7", displayName: "9595959efsffs" },
-];
 const Content = () => {
+  const [clients, setClients] = useState<IClient[]>([]);
+  const fetchClients = async () => {
+    try {
+      const response = await apiClient.get(`users`);
+      setClients(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  useEffect(() => {
+    fetchClients();
+  }, []);
   return (
     <Stack direction="column" spacing={1} padding={8}>
       <Typography variant="h4" component="span" paddingBottom={4}>
         {"Client List"}
       </Typography>
       {clients.map((client) => (
-        <Stack
-          direction="row"
-          alignItems="center"
-          spacing={2}
-          key={client.userId}
-        >
+        <Stack direction="row" alignItems="center" spacing={2} key={client.id}>
           <Avatar
-            src={"https://cdn.myanimelist.net/images/characters/6/496453.jpg"}
+            imgProps={{ referrerPolicy: "no-referrer" }}
+            src={client.profileImage}
+            alt={client.name}
             sx={{ width: 52, height: 52 }}
           />
           <Typography variant="h5" component="span">
-            {client.displayName}
+            {client.name}
           </Typography>
         </Stack>
       ))}

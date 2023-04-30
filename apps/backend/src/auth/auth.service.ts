@@ -57,10 +57,10 @@ export class AuthService {
   async renewAccessToken(
     user: JWTPayload,
   ): Promise<Pick<JWTToken, 'accessToken'>> {
-    const { userID } = user;
+    const { id } = user;
 
     const jwtPayload: JWTPayload = {
-      userID,
+      id,
     };
 
     const jwtToken = await this.signAccessTokenAsync(jwtPayload);
@@ -91,7 +91,7 @@ export class AuthService {
     });
 
     const jwtPayload: JWTPayload = {
-      userID: `${id}`,
+      id: `${id}`,
     };
 
     const jwtToken = await this.generateToken(jwtPayload);

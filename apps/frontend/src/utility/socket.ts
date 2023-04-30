@@ -1,18 +1,18 @@
 import { SocketMessageDTO, SocketMessageType } from "types";
 
-class WebSocketAPI {
+export class WebSocketAPI {
   private static instance: WebSocketAPI;
   private socket: WebSocket;
-  private eventHandlers: {
-    closeChannel: (channelId: string) => {};
-    ack: (channelId: string) => {};
-    error: () => {};
-    notFound: (channelId: string) => {};
-    join: () => {};
-    leave: () => {};
-    unauthorized: (channelId: string) => {};
-    message: (channelId: string, message: string) => {};
-    broadcast: () => {};
+  private eventHandlers = {
+    closeChannel: (channelId: string) => {},
+    ack: (channelId: string) => {},
+    error: () => {},
+    notFound: (channelId: string) => {},
+    join: () => {},
+    leave: () => {},
+    unauthorized: (channelId: string) => {},
+    message: (channelId: string, message: string) => {},
+    broadcast: () => {},
   };
 
   private constructor() {
@@ -52,7 +52,7 @@ class WebSocketAPI {
           this.eventHandlers.unauthorized(data.channelId);
           break;
         case SocketMessageType.SocketMessageTypeMessage:
-          this.eventHandlers.message(data.channelId, data.message);
+          this.eventHandlers.message(data.channelId, data.message ?? "");
           break;
         case SocketMessageType.SocketMessageTypeBroadcast:
           this.eventHandlers.broadcast();
@@ -76,31 +76,31 @@ class WebSocketAPI {
     this.socket.send(JSON.stringify(data));
   }
 
-  public setOnCloseChannel(handler: () => {}) {
+  public setOnCloseChannel(handler: () => void) {
     this.eventHandlers.closeChannel = handler;
   }
 
-  public setOnACK(handler: (channelId: string) => {}) {
+  public setOnACK(handler: (channelId: string) => void) {
     this.eventHandlers.ack = handler;
   }
 
-  public setOnError(handler: () => {}) {
+  public setOnError(handler: () => void) {
     this.eventHandlers.error = handler;
   }
 
-  public setOnNotFound(handler: (channelId: string) => {}) {
+  public setOnNotFound(handler: (channelId: string) => void) {
     this.eventHandlers.notFound = handler;
   }
 
-  public setOnJoin(handler: () => {}) {
+  public setOnJoin(handler: () => void) {
     this.eventHandlers.join = handler;
   }
 
-  public setOnLeave(handler: () => {}) {
+  public setOnLeave(handler: () => void) {
     this.eventHandlers.leave = handler;
   }
 
-  public setOnUnauthorized(handler: (channelId: string) => {}) {
+  public setOnUnauthorized(handler: (channelId: string) => void) {
     this.eventHandlers.unauthorized = handler;
   }
 
@@ -108,7 +108,7 @@ class WebSocketAPI {
     this.eventHandlers.message = handler;
   }
 
-  public setOnBroadcast(handler: () => {}) {
+  public setOnBroadcast(handler: () => void) {
     this.eventHandlers.broadcast = handler;
   }
 }

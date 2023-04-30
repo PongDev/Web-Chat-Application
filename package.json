@@ -14,7 +14,7 @@
     "db:migrate:dev": "dotenv -e .env -- pnpm --filter database db:migrate:dev",
     "db:migrate:deploy": "dotenv -e .env -- pnpm --filter database db:migrate:deploy",
     "dev": "turbo run build --filter config --filter database && turbo run dev --parallel",
-    "dev:frontend": "turbo run build --filter config --filter types && turbo run dev --filter frontend --filter config --filter types",
+    "dev:frontend": "turbo run build --filter config --filter types --filter frontend-optimizer && turbo run dev --filter frontend --filter config --filter types",
     "dev:backend": "turbo run build --filter config --filter database --filter types && turbo run dev --filter backend --filter config --filter database --filter types",
     "test:backend": "turbo run test --filter backend",
     "test:backend:cov": "turbo run test:cov --filter backend",
