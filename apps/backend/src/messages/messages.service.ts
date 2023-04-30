@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RoomsService } from 'src/rooms/rooms.service';
-import { CreateMessageDto } from 'types';
+import { CreateMessageDto, GetMessagesByRoomIdResponse } from 'types';
 
 @Injectable()
 export class MessagesService {
@@ -15,7 +15,7 @@ export class MessagesService {
     prevMessageId: string,
     limit: number,
     userId: string,
-  ) {
+  ): Promise<GetMessagesByRoomIdResponse> {
     if (!limit || limit <= 0) limit = 50;
 
     if (!(await this.roomsService.checkJoinedRoom(userId, roomId)))

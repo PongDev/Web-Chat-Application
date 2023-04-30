@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatus,
   Param,
   Post,
   Query,
@@ -10,8 +11,13 @@ import {
 import { MessagesService } from './messages.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
-import { JWTPayload, CreateMessageDto } from 'types';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  JWTPayload,
+  CreateMessageDto,
+  GetMessagesByRoomIdResponse,
+  RoomIdMessageResponse,
+} from 'types';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Messages')
 @Controller('messages')
@@ -19,6 +25,15 @@ export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
   @ApiBearerAuth()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Get messages by room ID',
+    type: [RoomIdMessageResponse],
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Not Member of Room',
+  })
   @Get('/:roomId')
   @UseGuards(JwtAuthGuard)
   async getMessagesByRoomId(
@@ -26,7 +41,7 @@ export class MessagesController {
     @Query('prevMessageId') prevMessageId: string,
     @Query('limit') limit: string,
     @User() user: JWTPayload,
-  ) {
+  ): Promise<GetMessagesByRoomIdResponse> {
     return await this.messagesService.getMessagesByRoomId(
       roomId,
       prevMessageId,
@@ -36,13 +51,21 @@ export class MessagesController {
   }
 
   @ApiBearerAuth()
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Create message',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Not Member of Room',
+  })
   @Post('/:roomId')
   @UseGuards(JwtAuthGuard)
   async createMessage(
     @Param('roomId') roomId: string,
     @User() user: JWTPayload,
     @Body() body: CreateMessageDto,
-  ) {
+  ): Promise<void> {
     return await this.messagesService.createMessage(roomId, user.userID, body);
   }
 }
