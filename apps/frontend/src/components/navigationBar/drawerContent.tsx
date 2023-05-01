@@ -24,14 +24,25 @@ import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Link from "next/link";
 
-function ItemGroups(groupName: string, items: string[]) {
-  const [open, setOpen] = React.useState(false);
+import { NextRouter, useRouter } from "next/router";
+
+function ItemGroups(
+  groupName: string,
+  items: string[],
+  routes: any[],
+  router: NextRouter
+) {
+  // routes is an array of routes to navigate to from /chat
+  const [open, setOpen] = React.useState(true);
   const toggleOpen = () => {
     setOpen(!open);
   };
+  const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    router.push(event.currentTarget.href);
+  };
   return (
     <Box>
-      {/* <div onClick={() => console.log('Clicked')}> */}
       <Button
         variant="text"
         onClick={toggleOpen}
@@ -57,7 +68,10 @@ function ItemGroups(groupName: string, items: string[]) {
         <List>
           {items.map((text: string, index) => (
             <ListItem disablePadding key={index}>
-              <ListItemButton>
+              <ListItemButton
+                href={"/chat/" + routes[index]}
+                onClick={handleClick}
+              >
                 <ListItemText primary={text} />
               </ListItemButton>
             </ListItem>
@@ -149,6 +163,11 @@ const NAVIGATION_CONTENT = [
 ];
 
 function DrawerContent() {
+  const router = useRouter();
+  const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    router.push(event.currentTarget.href);
+  };
   return (
     <Box paddingLeft={2}>
       <HelloHeader />
@@ -168,9 +187,24 @@ function DrawerContent() {
           </Link>
         ))}
       </List>
-      {ItemGroups("Created", ["Group 1", "Group 2", "Group 3"])}
-      {ItemGroups("Joined", ["Group 1", "Group 2", "Group 3"])}
-      {ItemGroups("Direct Message", ["Group 1", "Group 2", "Group 3"])}
+      {ItemGroups(
+        "Created",
+        ["Group 1", "Group 2", "Group 3"],
+        [1, 2, 3],
+        router
+      )}
+      {ItemGroups(
+        "Joined",
+        ["Group 1", "Group 2", "Group 3"],
+        [1, 2, 3],
+        router
+      )}
+      {ItemGroups(
+        "Direct Message",
+        ["Group 1", "Group 2", "Group 3"],
+        [1, 2, 3],
+        router
+      )}
     </Box>
   );
 }
