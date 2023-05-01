@@ -73,7 +73,7 @@ export class SocketService {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ payload }),
+        body: JSON.stringify(payload),
       },
     );
     return res.status === 200;
