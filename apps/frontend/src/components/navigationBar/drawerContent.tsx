@@ -22,9 +22,10 @@ import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import theme from "@/config/theme";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import Link from "next/link";
 
 function ItemGroups(groupName: string, items: string[]) {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
   const toggleOpen = () => {
     setOpen(!open);
   };
@@ -134,20 +135,37 @@ function HelloHeader() {
   );
 }
 
+const NAVIGATION_CONTENT = [
+  {
+    label: "All Rooms",
+    icon: <PublicIcon />,
+    path: "/",
+  },
+  {
+    label: "All Clients",
+    icon: <PersonIcon />,
+    path: "/clients",
+  },
+];
+
 function DrawerContent() {
   return (
     <Box paddingLeft={2}>
       <HelloHeader />
       <List>
-        {["All Rooms", "All Clients"].map((text, index) => (
-          <ListItem key={text} color="black" disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index == 0 ? <PublicIcon /> : <PersonIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
+        {NAVIGATION_CONTENT.map((text) => (
+          <Link
+            href={text.path}
+            passHref
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            <ListItem key={text.label} color="black" disablePadding>
+              <ListItemButton>
+                <ListItemIcon>{text.icon}</ListItemIcon>
+                <ListItemText primary={text.label} />
+              </ListItemButton>
+            </ListItem>
+          </Link>
         ))}
       </List>
       {ItemGroups("Created", ["Group 1", "Group 2", "Group 3"])}
