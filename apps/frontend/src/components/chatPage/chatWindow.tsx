@@ -31,21 +31,16 @@ const ChatWindow = () => {
   useEffect(() => {
     if (router.isReady && state === WebSocket.OPEN) {
       subscribe(router.query.id as string, handleSocketMessage);
-      send(
-        SocketMessageType.SocketMessageTypeJoin,
-        router.query.id as string,
-        ""
-      );
+      send(SocketMessageType.SocketMessageTypeJoin, router.query.id as string);
     }
 
     return () => {
       if (router.isReady && state === WebSocket.OPEN) {
-        unsubscribe(router.query.id as string, handleSocketMessage);
         send(
           SocketMessageType.SocketMessageTypeLeave,
-          router.query.id as string,
-          ""
+          router.query.id as string
         );
+        unsubscribe(router.query.id as string, handleSocketMessage);
       }
     };
   }, [router, send, state, subscribe, unsubscribe, handleSocketMessage]);

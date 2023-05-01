@@ -15,7 +15,7 @@ import { SocketMessageDTO, SocketMessageType } from "types";
 interface WebsocketContextValue {
   subscribe: (channelId: string, callback: (message: string) => void) => void;
   unsubscribe: (channelId: string, callback: (message: string) => void) => void;
-  send: (type: SocketMessageType, channelId: string, message: string) => void;
+  send: (type: SocketMessageType, channelId: string, message?: string) => void;
   state?: number;
 }
 
@@ -47,12 +47,12 @@ export const WebsocketProvider = (props: PropsWithChildren<{}>) => {
     const ws = new WebSocket(process.env.NEXT_PUBLIC_SOCKET_BASE_URL ?? "");
     ws.onmessage = (event) => handleMessage(event.data);
     ws.onerror = () => {
+      console.log("error");
       setWebsocketState(ws.readyState);
-      setTimeout(() => connect(), 1000);
     };
     ws.onclose = () => {
       setWebsocketState(ws.readyState);
-      setTimeout(() => connect(), 1000);
+      setWebsocket(null);
     };
     ws.onopen = () => {
       setWebsocketState(ws.readyState);
@@ -83,9 +83,9 @@ export const WebsocketProvider = (props: PropsWithChildren<{}>) => {
   );
 
   const send = useCallback(
-    (type: SocketMessageType, channelId: string, message: string) => {
+    (type: SocketMessageType, channelId: string, message?: string) => {
       if (websocket?.readyState !== WebSocket.OPEN) {
-        throw new Error("Websocket not connected");
+        return;
       }
       websocket?.send(
         JSON.stringify({
