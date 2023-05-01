@@ -10,6 +10,7 @@ import apiClient from "@/config/axios";
 import { useRouter } from "next/router";
 import { SocketMessageType } from "types";
 import { useWebsocket } from "@/context/WebsocketContext";
+import useRoomInfo from "@/hooks/useRoomInfo";
 
 const roomName = "network chat";
 const ChatWindow = () => {
@@ -17,6 +18,7 @@ const ChatWindow = () => {
   const { user } = useUser();
   const { subscribe, state, send, unsubscribe } = useWebsocket();
   const { messageListRef, messages, handleSocketMessage } = useLoadMessages();
+  const { roomInfo } = useRoomInfo();
   const [message, setMessage] = useState("");
 
   const handleSend = async () => {
@@ -56,7 +58,7 @@ const ChatWindow = () => {
       width="100%"
     >
       <Typography variant="h4" align="center">
-        {roomName}
+        {roomInfo?.name}
       </Typography>
       <Stack
         direction="column"

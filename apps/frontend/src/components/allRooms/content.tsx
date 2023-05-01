@@ -36,17 +36,18 @@ const Content = () => {
   const fetchRooms = async () => {
     try {
       const response = await apiClient.get(`rooms`);
-      console.log(response.data);
       setCards(response.data);
     } catch (error) {
       console.error(error);
     }
   };
+
   useEffect(() => {
     fetchRooms();
   }, [created]);
+
   return (
-    <Box padding={8}>
+    <Box paddingX={6} paddingY={2}>
       <Box sx={{ display: "flex" }} alignItems={"center"} paddingY={4}>
         <Typography variant="h4" component="span">
           {"All rooms"}
