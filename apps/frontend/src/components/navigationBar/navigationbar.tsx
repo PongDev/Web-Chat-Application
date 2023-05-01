@@ -9,9 +9,11 @@ import { Box } from "@mui/material";
 import DrawerContent from "./drawerContent";
 
 import theme from "@/config/theme";
+import { useUser } from "@/context/AuthContext";
 
 export function NavBar() {
   const drawerWidth = 240;
+  const { user } = useUser();
 
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
