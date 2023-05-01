@@ -10,30 +10,27 @@ import apiClient from "@/config/axios";
 import { useRouter } from "next/router";
 import { SocketMessageType } from "types";
 import { useWebsocket } from "@/context/WebsocketContext";
-import { Unsubscribe } from "@mui/icons-material";
+
 const roomName = "network chat";
 const ChatWindow = () => {
   const router = useRouter();
   const { user } = useUser();
   const { subscribe, state, send, unsubscribe } = useWebsocket();
-
+  const { messageListRef, messages, handleSocketMessage } = useLoadMessages();
   const [message, setMessage] = useState("");
+
   const handleSend = async () => {
     await apiClient.post(`messages/${router.query.id}`, { content: message });
     setMessage("");
   };
+
   const handleClickMore = () => {
     console.log("more stuff");
   };
 
-  const handleMessage = (message: string) => {
-    console.log(message);
-  };
-  const { messageListRef, messages } = useLoadMessages();
-
   useEffect(() => {
     if (router.isReady && state === WebSocket.OPEN) {
-      subscribe(router.query.id as string, handleMessage);
+      subscribe(router.query.id as string, handleSocketMessage);
       send(
         SocketMessageType.SocketMessageTypeJoin,
         router.query.id as string,
@@ -43,15 +40,15 @@ const ChatWindow = () => {
 
     return () => {
       if (router.isReady && state === WebSocket.OPEN) {
+        unsubscribe(router.query.id as string, handleSocketMessage);
         send(
           SocketMessageType.SocketMessageTypeLeave,
           router.query.id as string,
           ""
         );
-        unsubscribe(router.query.id as string, handleMessage);
       }
     };
-  }, [router, send, state, subscribe, unsubscribe]);
+  }, [router, send, state, subscribe, unsubscribe, handleSocketMessage]);
 
   return (
     <Stack
@@ -83,6 +80,10 @@ const ChatWindow = () => {
             key={message.messageId}
           ></Message>
         ))}
+        <div
+          id="bottom-sentinel"
+          style={{ marginTop: "auto !important", height: "1px" }}
+        />
       </Stack>
       <Stack direction="row" spacing={2} alignItems="center">
         <IconButton
