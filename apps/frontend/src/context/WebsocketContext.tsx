@@ -26,8 +26,7 @@ export const useWebsocket = () => useContext(WebsocketContext);
 
 export const WebsocketProvider = (props: PropsWithChildren<{}>) => {
   const { children } = props;
-  const router = useRouter();
-  const [websocket, setWebsocket] = useState<WebSocket | null>(null);
+  const websocket = useRef<WebSocket | null>(null);
   const [websocketState, setWebsocketState] = useState<number | undefined>();
   const subscribers = useRef<{
     [channelId: string]: Set<(message: string) => void>;
@@ -47,18 +46,17 @@ export const WebsocketProvider = (props: PropsWithChildren<{}>) => {
     const ws = new WebSocket(process.env.NEXT_PUBLIC_SOCKET_BASE_URL ?? "");
     ws.onmessage = (event) => handleMessage(event.data);
     ws.onerror = () => {
-      console.log("error");
       setWebsocketState(ws.readyState);
     };
     ws.onclose = () => {
       setWebsocketState(ws.readyState);
-      setWebsocket(null);
+      websocket.current = null;
     };
     ws.onopen = () => {
       setWebsocketState(ws.readyState);
     };
 
-    setWebsocket(ws);
+    websocket.current = ws;
   }, [handleMessage]);
 
   const subscribe = useCallback(
@@ -84,10 +82,10 @@ export const WebsocketProvider = (props: PropsWithChildren<{}>) => {
 
   const send = useCallback(
     (type: SocketMessageType, channelId: string, message?: string) => {
-      if (websocket?.readyState !== WebSocket.OPEN) {
+      if (websocket.current?.readyState !== WebSocket.OPEN) {
         return;
       }
-      websocket?.send(
+      websocket.current?.send(
         JSON.stringify({
           type,
           channelId,
@@ -100,12 +98,13 @@ export const WebsocketProvider = (props: PropsWithChildren<{}>) => {
   );
 
   useEffect(() => {
-    if (router.isReady && !websocket) connect();
+    if (!websocket.current) connect();
 
     return () => {
-      websocket?.close();
+      if (websocket.current?.readyState === WebSocket.OPEN)
+        websocket.current?.close();
     };
-  }, [connect, router, websocket]);
+  }, [connect]);
 
   const value = useMemo(
     () => ({
