@@ -61,7 +61,7 @@ export class RoomsController {
     @Body() body: CreateRoomDto,
     @User() user: JWTPayload,
   ): Promise<CreateRoomResultDto> {
-    return this.roomsService.createNewRoom(body.body, user.userID);
+    return this.roomsService.createNewRoom(body.body, user.userId);
   }
 
   @ApiBearerAuth()
@@ -72,7 +72,7 @@ export class RoomsController {
   @Get('/joined')
   @UseGuards(JwtAuthGuard)
   async getJoinedRooms(@User() user: JWTPayload): Promise<JoinedRoomsDto> {
-    return this.roomsService.getJoinedRooms(user.userID);
+    return this.roomsService.getJoinedRooms(user.userId);
   }
 
   // Join group room (I guess ?)
@@ -91,7 +91,7 @@ export class RoomsController {
     @User() user: JWTPayload,
     @Param('roomId') roomId: string,
   ): Promise<JoinGroupResultDto> {
-    return this.roomsService.joinGroupRoom(user.userID, roomId);
+    return this.roomsService.joinGroupRoom(user.userId, roomId);
   }
 
   @ApiBearerAuth()
@@ -104,7 +104,7 @@ export class RoomsController {
   async getCreatedRooms(
     @User() user: JWTPayload,
   ): Promise<JoinedRoomDetailsDto[]> {
-    return this.roomsService.getCreatedRooms(user.userID);
+    return this.roomsService.getCreatedRooms(user.userId);
   }
 
   @ApiBearerAuth()
@@ -122,6 +122,6 @@ export class RoomsController {
     @Query('roomId') roomId: string,
     @User() user: JWTPayload,
   ): Promise<RoomInfoDto> {
-    return this.roomsService.getRoomInfo(roomId, user.userID);
+    return this.roomsService.getRoomInfo(roomId, user.userId);
   }
 }
