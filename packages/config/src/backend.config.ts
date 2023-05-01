@@ -30,6 +30,9 @@ export type BackendConfig = {
   //     debug: boolean;
   //     playground: boolean;
   //   };
+  bcrypt: {
+    salt_rounds: number;
+  };
 };
 
 export const loadBackendConfig = (): BackendConfig => ({
@@ -60,4 +63,8 @@ export const loadBackendConfig = (): BackendConfig => ({
     parseInt(process.env.SOCKET_HEALTH_CHECK_INTERVAL ?? "", 10) || 5000,
   socketHealthCheckChannelName:
     process.env.SOCKET_HEALTH_CHECK_CHANNEL_NAME ?? "health-check",
+  bcrypt: {
+    salt_rounds:
+      parseInt(process.env.BACKEND_BCRYPT_SALT_ROUNDS ?? "", 10) || 10,
+  },
 });
