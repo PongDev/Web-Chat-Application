@@ -30,6 +30,6 @@ export class VerifierController {
     @Body() payload: VerifierRequestDTO,
     @User() user: JWTPayload,
   ): Promise<VerifierResponseDTO> {
-    return await this.verifierService.verify(user.userID, payload);
+    return await this.verifierService.verify(user.userId, payload);
   }
 }

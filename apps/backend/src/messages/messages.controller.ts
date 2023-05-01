@@ -47,7 +47,7 @@ export class MessagesController {
       roomId,
       prevMessageId,
       +limit,
-      user.userID,
+      user.userId,
     );
   }
 
@@ -71,6 +71,6 @@ export class MessagesController {
     @User() user: JWTPayload,
     @Body() body: CreateMessageDto,
   ): Promise<void> {
-    return await this.messagesService.createMessage(roomId, user.userID, body);
+    return await this.messagesService.createMessage(roomId, user.userId, body);
   }
 }

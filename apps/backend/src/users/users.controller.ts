@@ -38,7 +38,7 @@ export class UsersController {
   @Get('/me')
   @UseGuards(JwtAuthGuard)
   async getCurrentUser(@User() user: JWTPayload): Promise<UserDto> {
-    return await this.usersService.getUserById(user.userID);
+    return await this.usersService.getUserById(user.userId);
   }
 
   @ApiBearerAuth()
@@ -53,6 +53,6 @@ export class UsersController {
     @User() user: JWTPayload,
     @Body() body: UpdateUserDto,
   ): Promise<UserDto> {
-    return await this.usersService.updateUser(user.userID, body);
+    return await this.usersService.updateUser(user.userId, body);
   }
 }

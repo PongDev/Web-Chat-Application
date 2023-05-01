@@ -16,10 +16,10 @@ export class UsersService {
     });
   }
 
-  async updateUser(userID: string, body: UpdateUserDto): Promise<UserDto> {
+  async updateUser(userId: string, body: UpdateUserDto): Promise<UserDto> {
     return await this.prismaService.user.update({
       where: {
-        id: userID,
+        id: userId,
       },
       data: {
         name: body.name,
@@ -33,10 +33,10 @@ export class UsersService {
     });
   }
 
-  async getUserById(userID: string): Promise<UserDto> {
+  async getUserById(userId: string): Promise<UserDto> {
     return await this.prismaService.user.findUnique({
       where: {
-        id: userID,
+        id: userId,
       },
       select: {
         id: true,
