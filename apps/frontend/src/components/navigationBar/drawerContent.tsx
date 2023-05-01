@@ -25,7 +25,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Link from "next/link";
 
 import { NextRouter, useRouter } from "next/router";
-import { JoinedRoomDetailsDto } from "types";
+import { JoinedRoomDetailsDto, JoinedRoomsDto } from "types";
 import useCreateNavBar from "@/hooks/useCreateNavBar";
 
 function ItemGroups(
@@ -172,20 +172,15 @@ function DrawerContent() {
   );
 
   useEffect(() => {
-    const getRooms = async () => {
-      const createdRooms: JoinedRoomDetailsDto[] = await getCreatedRooms();
-      const joinedRooms: JoinedRoomDetailsDto[] = await getJoinedRooms();
-      setCreatedRooms(createdRooms);
-      setJoinedRooms(joinedRooms);
+    const fetchRooms = async () => {
+      const newCreatedRooms: JoinedRoomDetailsDto[] = await getCreatedRooms();
+      const joinedAndDM: JoinedRoomsDto = await getJoinedRooms();
+      setCreatedRooms(newCreatedRooms);
+      setJoinedRooms(joinedAndDM.groupRoom);
+      setDirectMessages(joinedAndDM.directRoom);
     };
-    getRooms();
+    fetchRooms();
   }, []);
-  // const createdRooms:JoinedRoomDetailsDto[] = await getCreatedRooms();
-  // // const joinedRooms:JoinedRoomDetailsDto[] = await getJoinedRooms();
-  // var createdRooms:JoinedRoomDetailsDto[] = [{'id':'1','name':'lalala'}, {'id':'2','name':'hellloooo'}];
-  // // var joinedRooms:JoinedRoomDetailsDto[] = [{'id':'1','name':'lalala'}, {'id':'2','name':'hellloooo'}];
-  // var directMessages:JoinedRoomDetailsDto[] = [];
-  //[{'id':'1','name':'lalala'}, {'id':'2','name':'hellloooo'}]
 
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
