@@ -14,12 +14,11 @@ const useCreateNavBar = () => {
 
   const getJoinedRooms = async () => {
     try {
-      const response = await apiClient.get(`/rooms/group/joined`);
+      const response = await apiClient.get(`/rooms/joined`);
       const data = response.data;
       return data;
     } catch (error) {
       console.error(error);
-      // return [];
     }
   };
   const getCreatedRooms = async () => {
@@ -28,7 +27,6 @@ const useCreateNavBar = () => {
       return response.data;
     } catch (error) {
       console.error(error);
-      // return [];
     }
   };
   return {
