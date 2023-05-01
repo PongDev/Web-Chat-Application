@@ -105,6 +105,13 @@ export class CreateRoomResultDto {
   id: string;
 }
 
+export class JoinRoonRequestDTO {
+  @ApiProperty({ type: () => String })
+  @IsString()
+  @IsOptional()
+  password?: string;
+}
+
 export class JoinGroupResultDto {
   @ApiProperty({ type: () => String, required: true })
   @IsString()

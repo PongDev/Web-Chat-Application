@@ -85,13 +85,22 @@ export class RoomsController {
     status: HttpStatus.NOT_FOUND,
     description: 'Group room not found',
   })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Group room password invalid',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Group room is not joinable',
+  })
   @Post('/group/join/:roomId')
   @UseGuards(JwtAuthGuard)
   async joinRoom(
     @User() user: JWTPayload,
     @Param('roomId') roomId: string,
+    @Body('password') password: string,
   ): Promise<JoinGroupResultDto> {
-    return this.roomsService.joinGroupRoom(user.userId, roomId);
+    return this.roomsService.joinGroupRoom(user.userId, roomId, password);
   }
 
   @ApiBearerAuth()
