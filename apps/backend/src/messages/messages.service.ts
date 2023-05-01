@@ -1,8 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RoomsService } from 'src/rooms/rooms.service';
 import { SocketService } from 'src/socket/socket.service';
@@ -48,7 +44,7 @@ export class MessagesService {
       },
     });
 
-    return messages.map((val) => ({
+    return messages.reverse().map((val) => ({
       messageId: val.id,
       message: val.text,
       displayName: val.senderUser.name,
