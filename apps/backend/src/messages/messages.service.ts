@@ -63,7 +63,7 @@ export class MessagesService {
 
     const result = await this.socketService.sendMessageToChannel(
       roomId,
-      JSON.stringify(body),
+      body.content,
     );
 
     if (!result)
