@@ -7,6 +7,7 @@ import type { AppProps } from "next/app";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import Layout from "@/components/layout";
 import { AuthProvider } from "@/context/AuthContext";
+import { WebsocketProvider } from "@/context/WebsocketContext";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -22,9 +23,11 @@ export default function App(props: AppPropsWithCache) {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <AuthProvider>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
+          <WebsocketProvider>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </WebsocketProvider>
         </AuthProvider>
       </ThemeProvider>
     </CacheProvider>
