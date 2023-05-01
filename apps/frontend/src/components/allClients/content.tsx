@@ -1,13 +1,12 @@
 import apiClient from "@/config/axios";
 import { Avatar, Stack, Typography } from "@mui/material";
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-interface IClient {
-  id: string;
-  name: string;
-  profileImage?: string;
-}
+import { CreateRoomResultDto, RoomType, UserDto } from "types";
+
 const Content = () => {
-  const [clients, setClients] = useState<IClient[]>([]);
+  const router = useRouter();
+  const [clients, setClients] = useState<UserDto[]>([]);
   const fetchClients = async () => {
     try {
       const response = await apiClient.get(`users`);
@@ -16,16 +15,39 @@ const Content = () => {
       console.error(error);
     }
   };
+
+  const handleClickUser = async (id: string) => {
+    try {
+      const response = await apiClient.post<CreateRoomResultDto>(`rooms`, {
+        body: {
+          type: RoomType.DIRECT,
+          userId: id,
+        },
+      });
+
+      router.push(`/chat/${response.data.id}`);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     fetchClients();
   }, []);
   return (
-    <Stack direction="column" spacing={1} padding={8}>
-      <Typography variant="h4" component="span" paddingBottom={4}>
+    <Stack direction="column" spacing={2} padding={8}>
+      <Typography variant="h4" component="span">
         {"Client List"}
       </Typography>
       {clients.map((client) => (
-        <Stack direction="row" alignItems="center" spacing={2} key={client.id}>
+        <Stack
+          onClick={() => handleClickUser(client.id)}
+          sx={{ cursor: "pointer" }}
+          direction="row"
+          alignItems="center"
+          spacing={2}
+          key={client.id}
+        >
           <Avatar
             imgProps={{ referrerPolicy: "no-referrer" }}
             src={client.profileImage}

@@ -119,7 +119,7 @@ export class RoomsController {
   @Get('/info/:roomId')
   @UseGuards(JwtAuthGuard)
   async getRoomInfo(
-    @Query('roomId') roomId: string,
+    @Param('roomId') roomId: string,
     @User() user: JWTPayload,
   ): Promise<RoomInfoDto> {
     return this.roomsService.getRoomInfo(roomId, user.userId);
