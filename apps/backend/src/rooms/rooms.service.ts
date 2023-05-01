@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SocketService } from 'src/socket/socket.service';
@@ -17,6 +18,8 @@ import {
   RoomInfoDto,
   RoomType,
 } from 'types';
+import * as bcrypt from 'bcrypt';
+import { backendConfig } from 'config';
 
 @Injectable()
 export class RoomsService {
@@ -28,7 +31,11 @@ export class RoomsService {
   private async createNewGroupRoom(
     name: string,
     userId: string,
+    password?: string,
   ): Promise<CreateRoomResultDto> {
+    if (password)
+      password = await bcrypt.hash(password, backendConfig.bcrypt.salt_rounds);
+    else password = undefined;
     return await this.prismaService.$transaction(async (tx) => {
       const newRoom = await tx.room.create({
         data: {
@@ -36,6 +43,7 @@ export class RoomsService {
           owner: userId,
           name,
           isJoinable: true,
+          password: password,
         },
       });
 
@@ -223,7 +231,11 @@ export class RoomsService {
 
     if (body.type === RoomType.GROUP) {
       const _body = body as CreateGroupRoomBodyDto;
-      newRoom = await this.createNewGroupRoom(_body.name, userId);
+      newRoom = await this.createNewGroupRoom(
+        _body.name,
+        userId,
+        _body.password,
+      );
     } else if (body.type === RoomType.DIRECT) {
       const _body = body as CreateDMRoomBodyDto;
       newRoom = await this.createNewDMRoom(userId, _body.userId);
@@ -259,6 +271,7 @@ export class RoomsService {
   async joinGroupRoom(
     userId: string,
     roomId: string,
+    password?: string,
   ): Promise<JoinGroupResultDto> {
     const room = await this.prismaService.room.findFirst({
       where: {
@@ -268,6 +281,10 @@ export class RoomsService {
     });
 
     if (!room) throw new NotFoundException('Group Room not found');
+    if (room.isJoinable === false)
+      throw new BadRequestException('Room is not joinable');
+    if (room.password && !(await bcrypt.compare(password, room.password)))
+      throw new UnauthorizedException('Invalid password');
 
     await this.prismaService.userRoomMember.upsert({
       where: {
