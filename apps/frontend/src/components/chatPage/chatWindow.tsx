@@ -8,41 +8,51 @@ import { useUser } from "@/context/AuthContext";
 import useLoadMessages from "@/hooks/useLoadMessages";
 import apiClient from "@/config/axios";
 import { useRouter } from "next/router";
-import { WebSocketAPI } from "@/utility/socket";
 import { SocketMessageType } from "types";
+import { useWebsocket } from "@/context/WebsocketContext";
+import { Unsubscribe } from "@mui/icons-material";
 const roomName = "network chat";
 const ChatWindow = () => {
   const router = useRouter();
   const { user } = useUser();
+  const { subscribe, state, send, unsubscribe } = useWebsocket();
+
   const [message, setMessage] = useState("");
-  const handleSend = () => {
-    apiClient.post(`messages/${router.query.id}`, { content: message });
+  const handleSend = async () => {
+    await apiClient.post(`messages/${router.query.id}`, { content: message });
     setMessage("");
-    console.log("sent");
   };
   const handleClickMore = () => {
     console.log("more stuff");
   };
+
+  const handleMessage = (message: string) => {
+    console.log(message);
+  };
   const { messageListRef, messages } = useLoadMessages();
-  const webSocket = useRef<WebSocketAPI | null>(null);
+
   useEffect(() => {
-    if (router.isReady) {
-      apiClient.post(`rooms/group/join/${router.query.id}`);
-      webSocket.current = WebSocketAPI.getInstance();
-      webSocket.current?.getSocket().addEventListener("open", (event) => {
-        console.log("WebSocket connection opened.");
-        webSocket.current?.send({
-          type: SocketMessageType.SocketMessageTypeJoin,
-          channelId: router.query.id as string,
-          message: "",
-          token: localStorage.getItem("accessToken") || "",
-        });
-      });
-      webSocket.current?.getSocket().addEventListener("message", (event) => {
-        console.log(event.data);
-      });
+    if (router.isReady && state === WebSocket.OPEN) {
+      subscribe(router.query.id as string, handleMessage);
+      send(
+        SocketMessageType.SocketMessageTypeJoin,
+        router.query.id as string,
+        ""
+      );
     }
-  }, [router]);
+
+    return () => {
+      if (router.isReady && state === WebSocket.OPEN) {
+        send(
+          SocketMessageType.SocketMessageTypeLeave,
+          router.query.id as string,
+          ""
+        );
+        unsubscribe(router.query.id as string, handleMessage);
+      }
+    };
+  }, [router, send, state, subscribe, unsubscribe]);
+
   return (
     <Stack
       direction="column"
