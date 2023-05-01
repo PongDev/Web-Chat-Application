@@ -32,6 +32,7 @@ apiClient.interceptors.response.use(
           localStorage.setItem("accessToken", res.data.accessToken);
 
           err.config.retry = true;
+          err.config.headers.Authorization = `Bearer ${res.data.accessToken}`;
           return await apiClient(err.config);
         } catch (err) {
           localStorage.removeItem("accessToken");
