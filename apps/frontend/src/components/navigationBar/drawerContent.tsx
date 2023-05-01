@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -25,15 +25,16 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Link from "next/link";
 
 import { NextRouter, useRouter } from "next/router";
+import { JoinedRoomDetailsDto } from "types";
+import useCreateNavBar from "@/hooks/useCreateNavBar";
 
 function ItemGroups(
   groupName: string,
-  items: string[],
-  routes: any[],
+  items: JoinedRoomDetailsDto[],
   router: NextRouter
 ) {
   // routes is an array of routes to navigate to from /chat
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
   const toggleOpen = () => {
     setOpen(!open);
   };
@@ -66,13 +67,10 @@ function ItemGroups(
       {/* </div> */}
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List>
-          {items.map((text: string, index) => (
+          {items.map((item: JoinedRoomDetailsDto, index) => (
             <ListItem disablePadding key={index}>
-              <ListItemButton
-                href={"/chat/" + routes[index]}
-                onClick={handleClick}
-              >
-                <ListItemText primary={text} />
+              <ListItemButton href={"/chat/" + item.id} onClick={handleClick}>
+                <ListItemText primary={item.name} />
               </ListItemButton>
             </ListItem>
           ))}
@@ -83,9 +81,10 @@ function ItemGroups(
 }
 
 function HelloHeader() {
-  const [open, setOpen] = React.useState(false);
-  const [workingName, setWorkingName] = React.useState("<Working Name>");
-  const [text, setText] = React.useState("");
+  const [open, setOpen] = useState(false);
+  const [workingName, setWorkingName] = useState("<Working Name>");
+  const [text, setText] = useState("");
+  const { updateUsername, getJoinedRooms, getCreatedRooms } = useCreateNavBar();
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -96,6 +95,7 @@ function HelloHeader() {
 
   const handleSave = () => {
     setWorkingName(text);
+    updateUsername(text);
     setOpen(false);
   };
   return (
@@ -163,7 +163,30 @@ const NAVIGATION_CONTENT = [
 ];
 
 function DrawerContent() {
+  const { updateUsername, getJoinedRooms, getCreatedRooms } = useCreateNavBar();
   const router = useRouter();
+  const [createdRooms, setCreatedRooms] = useState<JoinedRoomDetailsDto[]>([]);
+  const [joinedRooms, setJoinedRooms] = useState<JoinedRoomDetailsDto[]>([]);
+  const [directMessages, setDirectMessages] = useState<JoinedRoomDetailsDto[]>(
+    []
+  );
+
+  useEffect(() => {
+    const getRooms = async () => {
+      const createdRooms: JoinedRoomDetailsDto[] = await getCreatedRooms();
+      const joinedRooms: JoinedRoomDetailsDto[] = await getJoinedRooms();
+      setCreatedRooms(createdRooms);
+      setJoinedRooms(joinedRooms);
+    };
+    getRooms();
+  }, []);
+  // const createdRooms:JoinedRoomDetailsDto[] = await getCreatedRooms();
+  // // const joinedRooms:JoinedRoomDetailsDto[] = await getJoinedRooms();
+  // var createdRooms:JoinedRoomDetailsDto[] = [{'id':'1','name':'lalala'}, {'id':'2','name':'hellloooo'}];
+  // // var joinedRooms:JoinedRoomDetailsDto[] = [{'id':'1','name':'lalala'}, {'id':'2','name':'hellloooo'}];
+  // var directMessages:JoinedRoomDetailsDto[] = [];
+  //[{'id':'1','name':'lalala'}, {'id':'2','name':'hellloooo'}]
+
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
     router.push(event.currentTarget.href);
@@ -187,24 +210,9 @@ function DrawerContent() {
           </Link>
         ))}
       </List>
-      {ItemGroups(
-        "Created",
-        ["Group 1", "Group 2", "Group 3"],
-        [1, 2, 3],
-        router
-      )}
-      {ItemGroups(
-        "Joined",
-        ["Group 1", "Group 2", "Group 3"],
-        [1, 2, 3],
-        router
-      )}
-      {ItemGroups(
-        "Direct Message",
-        ["Group 1", "Group 2", "Group 3"],
-        [1, 2, 3],
-        router
-      )}
+      {ItemGroups("Created", createdRooms, router)}
+      {ItemGroups("Joined", joinedRooms, router)}
+      {ItemGroups("Direct Message", directMessages, router)}
     </Box>
   );
 }
