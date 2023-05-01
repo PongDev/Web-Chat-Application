@@ -7,7 +7,8 @@ const useLoadMessages = () => {
   const observer = useRef<IntersectionObserver | null>(null);
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [isBottom, setIsBottom] = useState<boolean>(false);
-  const isLatest = useRef(false);
+  const isLatest = useRef(true);
+  const memoIsLatest = useRef(false);
   const messageListRef = useRef<HTMLDivElement>(null);
   const [scrollHeight, setScrollHeight] = useState(0);
   const prevId = useRef("");
@@ -26,6 +27,7 @@ const useLoadMessages = () => {
       },
     ]);
 
+    memoIsLatest.current = isLatest.current;
     isSocketMessage.current = true;
   }, []);
 
@@ -108,10 +110,13 @@ const useLoadMessages = () => {
     if (messages[0]) {
       prevId.current = messages[0].messageId;
     }
-    if (isLatest.current && messageListRef.current && isSocketMessage.current) {
+    if (
+      memoIsLatest.current &&
+      messageListRef.current &&
+      isSocketMessage.current
+    ) {
       messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
     }
-    isSocketMessage.current = false;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
 
