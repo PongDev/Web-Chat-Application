@@ -6,7 +6,11 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RoomsService } from 'src/rooms/rooms.service';
 import { SocketService } from 'src/socket/socket.service';
-import { CreateMessageDto, GetMessagesByRoomIdResponse } from 'types';
+import {
+  CreateMessageDto,
+  GetMessagesByRoomIdResponse,
+  RoomIdMessageResponse,
+} from 'types';
 
 @Injectable()
 export class MessagesService {
@@ -61,22 +65,41 @@ export class MessagesService {
     if (!(await this.roomsService.checkJoinedRoom(userId, roomId)))
       throw new ForbiddenException('You are not a member of this room');
 
+    const messageData = await this.prisma.message.create({
+      data: {
+        roomId,
+        senderId: userId,
+        text: body.content,
+      },
+      select: {
+        id: true,
+        text: true,
+        createdAt: true,
+        senderUser: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    const messagePayload: RoomIdMessageResponse = {
+      messageId: messageData.id,
+      message: messageData.text,
+      displayName: messageData.senderUser.name,
+      createdAt: messageData.createdAt,
+      userId: messageData.senderUser.id,
+    };
+
     const result = await this.socketService.sendMessageToChannel(
       roomId,
-      body.content,
+      JSON.stringify(messagePayload),
     );
 
     if (!result)
       throw new InternalServerErrorException(
         "Couldn't send message to channel",
       );
-
-    await this.prisma.message.create({
-      data: {
-        roomId,
-        senderId: userId,
-        text: body.content,
-      },
-    });
   }
 }
