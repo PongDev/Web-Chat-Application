@@ -1,7 +1,9 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: `${process.env.NEXT_PUBLIC_API_URL}${
+    process.env.NEXT_PUBLIC_API_URL?.endsWith("/") ? "" : "/"
+  }`,
   withCredentials: true,
 });
 
@@ -21,7 +23,7 @@ apiClient.interceptors.response.use(
       if (refreshToken) {
         try {
           const res = await axios.post(
-            `${process.env.NEXT_PUBLIC_API_URL}/auth/token/refresh`,
+            `${process.env.NEXT_PUBLIC_API_URL}auth/token/refresh`,
             {},
             {
               headers: {
