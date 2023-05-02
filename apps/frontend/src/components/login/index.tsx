@@ -1,5 +1,4 @@
 import { Box, Button, Typography, useTheme } from "@mui/material";
-import Script from "next/script";
 import useGoogleSignin from "./hooks/useGoogleSignin";
 
 const Login = () => {
@@ -8,10 +7,6 @@ const Login = () => {
 
   return (
     <>
-      <Script
-        src="https://accounts.google.com/gsi/client"
-        strategy="beforeInteractive"
-      />
       <Box
         flex={1}
         display="flex"

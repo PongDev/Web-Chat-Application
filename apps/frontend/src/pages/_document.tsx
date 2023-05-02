@@ -9,6 +9,7 @@ import NextDocument, {
   Main,
   NextScript,
 } from "next/document";
+import Script from "next/script";
 
 export default class RootDocument extends NextDocument {
   static async getInitialProps(
@@ -57,6 +58,10 @@ export default class RootDocument extends NextDocument {
           <link rel="shortcut icon" href="/favicon.ico" />
           <meta name="emotion-insertion-point" content="" />
           {(this.props as any).emotionStyleTags}
+          <Script
+            src="https://accounts.google.com/gsi/client"
+            strategy="beforeInteractive"
+          />
         </Head>
         <body style={{ margin: "0px" }}>
           <Main />
