@@ -30,7 +30,7 @@ const useGoogleSignin = () => {
       await refetch();
       router.push("/");
     },
-    [router, apiClient]
+    [refetch, router]
   );
 
   const initGoogleButton = useCallback(async () => {
@@ -62,7 +62,7 @@ const useGoogleSignin = () => {
       }
       initGoogleButton();
     }
-  }, [initGoogleButton]);
+  }, [initGoogleButton, loading, router, user]);
 
   return { handleSignin };
 };

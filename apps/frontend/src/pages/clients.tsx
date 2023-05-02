@@ -1,7 +1,4 @@
-import React from "react";
 import Content from "@/components/allClients/content";
+import withAuthGuard from "@/guards/withAuthGuard";
 
-const AllClients = () => {
-  return <Content />;
-};
-export default AllClients;
+export default withAuthGuard(Content);
