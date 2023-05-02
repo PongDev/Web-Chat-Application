@@ -16,7 +16,7 @@
 
 ### Setup Environment
 
-- Copy `.env.template` to `.env` and set environment variables
+- Copy `.env.template` to `.env` and set environment variables (Both in root and frontend)
 
 ### Install dependencies
 
