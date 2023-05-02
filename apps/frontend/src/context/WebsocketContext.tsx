@@ -44,16 +44,29 @@ export const WebsocketProvider = (props: PropsWithChildren<{}>) => {
 
   const connect = useCallback(() => {
     const ws = new WebSocket(process.env.NEXT_PUBLIC_SOCKET_BASE_URL ?? "");
+    let timeout: NodeJS.Timeout;
+
     ws.onmessage = (event) => handleMessage(event.data);
     ws.onerror = () => {
       setWebsocketState(ws.readyState);
+      websocket.current = null;
+      clearInterval(timeout);
     };
     ws.onclose = () => {
       setWebsocketState(ws.readyState);
       websocket.current = null;
+      clearInterval(timeout);
     };
     ws.onopen = () => {
       setWebsocketState(ws.readyState);
+      timeout = setInterval(() => {
+        if (ws.readyState === WebSocket.OPEN)
+          ws.send(
+            JSON.stringify({
+              type: SocketMessageType.SocketMessageTypePing,
+            })
+          );
+      }, 15000);
     };
 
     websocket.current = ws;

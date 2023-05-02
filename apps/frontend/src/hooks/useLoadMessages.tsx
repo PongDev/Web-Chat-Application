@@ -49,10 +49,11 @@ const useLoadMessages = () => {
           createdAt: dayjs(message.createdAt).format("YYYY-MM-DD HH:mm"),
         }));
 
+        isMore.current = messages.length > 0;
+        if (messages.length > 0) prevId.current = messages[0].messageId;
+
         if (override) setMessages(messages);
         else setMessages((prevMessages) => [...messages, ...prevMessages]);
-
-        isMore.current = messages.length > 0;
       } catch (error) {
         console.error(error);
       }
@@ -131,11 +132,14 @@ const useLoadMessages = () => {
       setScrollHeight(messageListRef.current!.scrollHeight);
       timeoutId = window.setTimeout(() => {
         isFirst.current = false;
-      }, 1);
-    }
-
-    if (messages[0]) {
-      prevId.current = messages[0].messageId;
+      }, 100);
+    } else if (
+      isSocketMessage.current &&
+      isLatest.current &&
+      messageListRef.current
+    ) {
+      messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+      isSocketMessage.current = false;
     }
 
     return () => {

@@ -28,6 +28,7 @@ export enum SocketMessageType {
   SocketMessageTypeNotFound = "NOT_FOUND",
   SocketMessageTypeJoin = "JOIN",
   SocketMessageTypeLeave = "LEAVE",
+  SocketMessageTypePing = "PING",
   SocketMessageTypeUnauthorized = "UNAUTHORIZED",
   SocketMessageTypeMessage = "MESSAGE",
   SocketMessageTypeBroadcast = "BROADCAST",
