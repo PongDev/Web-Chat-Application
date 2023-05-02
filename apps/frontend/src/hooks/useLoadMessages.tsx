@@ -53,7 +53,6 @@ const useLoadMessages = () => {
         else setMessages((prevMessages) => [...messages, ...prevMessages]);
 
         isMore.current = messages.length > 0;
-        prevId.current = response.data[0].messageId;
       } catch (error) {
         console.error(error);
       }
@@ -96,10 +95,11 @@ const useLoadMessages = () => {
   useEffect(() => {
     isFirst.current = true;
     setScrollHeight(0);
-  }, [router.query.id]);
+  }, [router, router.query.id]);
 
   useEffect(() => {
     if (router.isReady && isFirst.current) {
+      console.log("fetch 1");
       fetchMore(true);
     }
   }, [fetchMore, router.isReady, router.query.id]);
@@ -107,13 +107,15 @@ const useLoadMessages = () => {
   useEffect(() => {
     if (router.isReady) {
       if (!isFirst.current && isBottom && isMore.current) {
+        console.log("fetch 2");
         fetchMore();
         setIsBottom(false);
       }
     }
-  }, [router, isBottom, fetchMore]);
+  }, [router.isReady, isBottom, fetchMore]);
 
   useEffect(() => {
+    let timeoutId: number;
     if (!isFirst.current) {
       if (
         messageListRef.current &&
@@ -127,14 +129,26 @@ const useLoadMessages = () => {
     } else if (isFirst.current && messageListRef.current) {
       messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
       setScrollHeight(messageListRef.current!.scrollHeight);
-      isFirst.current = false;
+      timeoutId = window.setTimeout(() => {
+        isFirst.current = false;
+      }, 1);
     }
 
     if (messages[0]) {
       prevId.current = messages[0].messageId;
     }
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
+
+  useEffect(() => {
+    return () => {
+      setMessages([]);
+    };
+  }, []);
 
   return {
     messageListRef: messageListRef,
