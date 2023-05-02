@@ -122,6 +122,7 @@ export class JoinGroupResultDto {
 export class JoinedRoomDetailsDto {
   id: string;
   name: string;
+  isRequiredPassword: boolean;
 }
 
 export class RoomBriefDetailsDto extends JoinedRoomDetailsDto {

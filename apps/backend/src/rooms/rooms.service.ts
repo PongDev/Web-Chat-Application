@@ -158,6 +158,7 @@ export class RoomsService {
         room.UserRoomMember[0].User.id === userId
           ? room.UserRoomMember[1].User.name
           : room.UserRoomMember[0].User.name,
+      isRequiredPassword: false,
     }));
   }
 
@@ -176,6 +177,7 @@ export class RoomsService {
           select: {
             name: true,
             id: true,
+            password: true,
           },
         },
       },
@@ -184,6 +186,7 @@ export class RoomsService {
     return groupRoom.map((room) => ({
       id: room.Room.id,
       name: room.Room.name,
+      isRequiredPassword: room.Room.password ? true : false,
     }));
   }
 
@@ -220,6 +223,7 @@ export class RoomsService {
       name: room.name,
       owner: room.OwnerUser.name,
       userCount: room.UserRoomMember.length,
+      isRequiredPassword: room.password ? true : false,
     }));
   }
 
@@ -252,10 +256,15 @@ export class RoomsService {
       select: {
         id: true,
         name: true,
+        password: true,
       },
     });
 
-    return rooms;
+    return rooms.map((room) => ({
+      id: room.id,
+      name: room.name,
+      isRequiredPassword: room.password ? true : false,
+    }));
   }
 
   async getJoinedRooms(userId: string): Promise<JoinedRoomsDto> {
