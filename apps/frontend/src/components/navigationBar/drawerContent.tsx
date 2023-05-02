@@ -28,6 +28,8 @@ import { NextRouter, useRouter } from "next/router";
 import { JoinedRoomDetailsDto, JoinedRoomsDto } from "types";
 import useCreateNavBar from "@/hooks/useCreateNavBar";
 import { useNavBar } from "@/context/NavbarContext";
+import { Logout, LogoutRounded } from "@mui/icons-material";
+import { useUser } from "@/context/AuthContext";
 
 function ItemGroups(
   groupName: string,
@@ -86,6 +88,7 @@ function HelloHeader() {
   const [workingName, setWorkingName] = useState("");
   const [text, setText] = useState("");
   const { name } = useNavBar();
+  const { logout } = useUser();
   const { updateUsername } = useCreateNavBar();
   const handleClickOpen = () => {
     setOpen(true);
@@ -101,16 +104,31 @@ function HelloHeader() {
     setOpen(false);
   };
 
+  const handleLogout = async () => {
+    await logout();
+  };
+
   useEffect(() => {
     setWorkingName(name ?? "");
   }, [name]);
 
   return (
     <Box paddingX={1} paddingY={2}>
-      <Box sx={{ display: "flex", alignItems: "center" }}>
-        <Typography variant="h5">Hello</Typography>
-        <IconButton onClick={handleClickOpen}>
-          <ModeEditIcon sx={{ color: theme.palette.primary[500] }} />
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Typography variant="h5">Hello</Typography>
+          <IconButton onClick={handleClickOpen}>
+            <ModeEditIcon sx={{ color: theme.palette.primary[500] }} />
+          </IconButton>
+        </Box>
+        <IconButton onClick={handleLogout}>
+          <LogoutRounded sx={{ color: theme.palette.primary[500] }} />
         </IconButton>
       </Box>
       <Typography variant="h5" color={theme.palette.primary[800]}>
