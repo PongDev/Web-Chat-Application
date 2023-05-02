@@ -8,6 +8,7 @@ import { ThemeProvider, CssBaseline } from "@mui/material";
 import Layout from "@/components/layout";
 import { AuthProvider } from "@/context/AuthContext";
 import { WebsocketProvider } from "@/context/WebsocketContext";
+import { NavBarProvider } from "@/context/NavbarContext";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -23,11 +24,13 @@ export default function App(props: AppPropsWithCache) {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <AuthProvider>
-          <WebsocketProvider>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
-          </WebsocketProvider>
+          <NavBarProvider>
+            <WebsocketProvider>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </WebsocketProvider>
+          </NavBarProvider>
         </AuthProvider>
       </ThemeProvider>
     </CacheProvider>

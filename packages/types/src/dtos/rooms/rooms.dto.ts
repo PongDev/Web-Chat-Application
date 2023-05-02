@@ -133,4 +133,5 @@ export class RoomBriefDetailsDto extends JoinedRoomDetailsDto {
 export class JoinedRoomsDto {
   directRoom: JoinedRoomDetailsDto[];
   groupRoom: JoinedRoomDetailsDto[];
+  createdGroupRoom: JoinedRoomDetailsDto[];
 }

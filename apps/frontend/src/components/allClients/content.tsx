@@ -1,4 +1,5 @@
 import apiClient from "@/config/axios";
+import { useNavBar } from "@/context/NavbarContext";
 import { Avatar, Stack, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -7,6 +8,8 @@ import { CreateRoomResultDto, RoomType, UserDto } from "types";
 const Content = () => {
   const router = useRouter();
   const [clients, setClients] = useState<UserDto[]>([]);
+  const { updateRoom } = useNavBar();
+
   const fetchClients = async () => {
     try {
       const response = await apiClient.get(`users`);
@@ -16,7 +19,7 @@ const Content = () => {
     }
   };
 
-  const handleClickUser = async (id: string) => {
+  const handleClickUser = async (id: string, name: string) => {
     try {
       const response = await apiClient.post<CreateRoomResultDto>(`rooms`, {
         body: {
@@ -24,7 +27,7 @@ const Content = () => {
           userId: id,
         },
       });
-
+      updateRoom("direct", response.data.id, name);
       router.push(`/chat/${response.data.id}`);
     } catch (error) {
       console.error(error);
@@ -41,7 +44,7 @@ const Content = () => {
       </Typography>
       {clients.map((client) => (
         <Stack
-          onClick={() => handleClickUser(client.id)}
+          onClick={() => handleClickUser(client.id, client.name)}
           sx={{ cursor: "pointer" }}
           direction="row"
           alignItems="center"

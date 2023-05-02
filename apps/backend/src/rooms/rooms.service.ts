@@ -270,10 +270,12 @@ export class RoomsService {
   async getJoinedRooms(userId: string): Promise<JoinedRoomsDto> {
     const directRoom = await this.getJoinedDMRoom(userId);
     const groupRoom = await this.getJoinedGroupRoom(userId);
+    const createdGroupRoom = await this.getCreatedRooms(userId);
 
     return {
       directRoom,
       groupRoom,
+      createdGroupRoom,
     };
   }
 
@@ -289,7 +291,7 @@ export class RoomsService {
       },
     });
 
-    if (!room) throw new NotFoundException('Group Room not found');
+    if (!room) throw new NotFoundException('Group Room not foundd');
     if (room.isJoinable === false)
       throw new BadRequestException('Room is not joinable');
     if (room.password && !(await bcrypt.compare(password, room.password)))
