@@ -22,6 +22,7 @@ const ChatWindow = () => {
   const [message, setMessage] = useState("");
 
   const handleSend = async () => {
+    if (!message) return;
     await apiClient.post(`messages/${router.query.id}`, { content: message });
     setMessage("");
   };
@@ -97,6 +98,12 @@ const ChatWindow = () => {
           multiline
           maxRows={4}
           value={message}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
           onChange={(e) => setMessage(e.target.value)}
         />
         <IconButton aria-label="send button" size="large" onClick={handleSend}>

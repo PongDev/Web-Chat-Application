@@ -28,7 +28,7 @@ const Login = () => {
           boxShadow="0px 4px 4px rgba(0, 0, 0, 0.25)"
           borderColor="black"
         >
-          <Typography variant="h4">Welcome to XXX</Typography>
+          <Typography variant="h4">Welcome to Chat Application</Typography>
           <Button
             variant="contained"
             fullWidth

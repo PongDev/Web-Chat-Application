@@ -42,7 +42,7 @@ const Message = ({ ownMessage, message }: IMessageProps) => {
             <CardContent>
               <Typography
                 variant="subtitle1"
-                sx={{ overflowWrap: "break-word" }}
+                sx={{ overflowWrap: "break-word", whiteSpace: "pre-wrap" }}
               >
                 {message.message}
               </Typography>
