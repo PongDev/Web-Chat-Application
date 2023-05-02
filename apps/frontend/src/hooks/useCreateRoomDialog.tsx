@@ -1,10 +1,12 @@
 import apiClient from "@/config/axios";
 import { useNavBar } from "@/context/NavbarContext";
 import { useState } from "react";
+import { CreateRoomDto } from "types";
 
 const useCreateRoomDialog = () => {
   const [open, setOpen] = useState(false);
   const [newRoomName, setNewRoomName] = useState("");
+  const [password, setPassword] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [created, setCreated] = useState(false);
 
@@ -26,10 +28,11 @@ const useCreateRoomDialog = () => {
       setSubmitted(true);
       return;
     }
-    const { data } = await apiClient.post("rooms", {
+    const { data } = await apiClient.post<any, any, CreateRoomDto>("rooms", {
       body: {
         type: "GROUP",
         name: newRoomName,
+        password: password || undefined,
       },
     });
     updateRoom("created", data.id, newRoomName);
@@ -48,6 +51,8 @@ const useCreateRoomDialog = () => {
     handleCreate,
     setNewRoomName,
     updateRoomNavbar: updateRoom,
+    setPassword,
+    password,
   };
 };
 

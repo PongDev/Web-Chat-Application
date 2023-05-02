@@ -15,6 +15,8 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RoomBox from "./roomBox";
 import useCreateRoomDialog from "@/hooks/useCreateRoomDialog";
 import apiClient from "@/config/axios";
+import useJoinRoomDialog from "@/hooks/useJoinRoomDialog";
+import { RoomBriefDetailsDto } from "types";
 interface IRoom {
   id: string;
   userCount: number;
@@ -27,14 +29,25 @@ const Content = () => {
     newRoomName,
     submitted,
     created,
+    setPassword,
     handleClickOpen,
     handleClose,
     handleCreate,
     setNewRoomName,
-    updateRoomNavbar,
   } = useCreateRoomDialog();
 
-  const [cards, setCards] = useState<IRoom[]>([]);
+  const {
+    open: openJoin,
+    error: errorJoin,
+    submitted: submittedJoin,
+    handleClose: handleCloseJoin,
+    setPassword: setPasswordJoin,
+    handleOpen: handleOpenJoin,
+    password: passwordJoin,
+    handleSubmit: handleJoin,
+  } = useJoinRoomDialog();
+
+  const [cards, setCards] = useState<RoomBriefDetailsDto[]>([]);
   const fetchRooms = async () => {
     try {
       const response = await apiClient.get(`rooms`);
@@ -75,11 +88,58 @@ const Content = () => {
               roomName={room.name}
               currentUser={room.userCount}
               id={room.id}
-              updateRoomNavbar={updateRoomNavbar}
-            ></RoomBox>
+              handleJoinRoom={handleOpenJoin}
+              requiredPassword={room.isRequiredPassword}
+            />
           </Grid>
         ))}
       </Grid>
+      <Dialog
+        open={openJoin}
+        onClose={handleCloseJoin}
+        maxWidth="sm"
+        fullWidth
+        sx={{ backdropFilter: "blur(5px)" }}
+        disableRestoreFocus
+      >
+        <DialogTitle variant="h5" align="center">
+          Join Room
+        </DialogTitle>
+        <DialogContent sx={{ paddingY: 0 }}>
+          <TextField
+            autoFocus
+            label="Password"
+            margin="dense"
+            fullWidth
+            type="password"
+            variant="filled"
+            onChange={(v) => setPasswordJoin(v.target.value)}
+            error={passwordJoin === "" && submittedJoin}
+            helperText={
+              passwordJoin === "" && submittedJoin
+                ? "Please enter a password"
+                : " "
+            }
+          />
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: "center", paddingTop: 0 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ borderRadius: 6, minWidth: 100 }}
+            onClick={() => handleJoin()}
+          >
+            Join
+          </Button>
+        </DialogActions>
+        <Typography
+          variant="subtitle1"
+          sx={{ textAlign: "center", paddingBottom: 2 }}
+          color="error"
+        >
+          {errorJoin}
+        </Typography>
+      </Dialog>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -97,15 +157,24 @@ const Content = () => {
             label="Room name"
             margin="dense"
             fullWidth
+            required
             variant="filled"
             onChange={(v) => setNewRoomName(v.target.value)}
             error={newRoomName === "" && submitted}
             helperText={
-              newRoomName === "" && submitted ? "Please enter a room name" : " "
+              newRoomName === "" && submitted ? "Please enter a room name" : ""
             }
           />
+          <TextField
+            label="Password"
+            margin="dense"
+            fullWidth
+            type="password"
+            variant="filled"
+            onChange={(v) => setPassword(v.target.value)}
+          />
         </DialogContent>
-        <DialogActions sx={{ justifyContent: "center", paddingTop: 0 }}>
+        <DialogActions sx={{ justifyContent: "center", paddingTop: "1rem" }}>
           <Button
             variant="contained"
             color="primary"

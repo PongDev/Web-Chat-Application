@@ -18,6 +18,12 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (res) => res,
   async (err) => {
+    if (
+      err?.response?.data?.message !== "Unauthorized" &&
+      err?.response?.status === 401
+    )
+      throw err;
+
     if (err?.response?.status === 401 && !err?.config?.retry) {
       const refreshToken = localStorage.getItem("refreshToken");
       if (refreshToken) {

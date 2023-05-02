@@ -6,17 +6,15 @@ import theme from "@/config/theme";
 import apiClient from "@/config/axios";
 import { useRouter } from "next/router";
 import { UpdateRoomType } from "@/context/NavbarContext";
+import { JoinedRoomDetailsDto } from "types";
 
 interface IRoomBoxProps {
   currentUser: number;
   roomName: string;
   owner: string;
   id: string;
-  updateRoomNavbar: (
-    type: UpdateRoomType,
-    roomId: string,
-    roomName: string
-  ) => void;
+  requiredPassword: boolean;
+  handleJoinRoom: (room: JoinedRoomDetailsDto) => void;
 }
 
 const RoomBox = ({
@@ -24,13 +22,15 @@ const RoomBox = ({
   roomName,
   owner,
   id,
-  updateRoomNavbar,
+  requiredPassword,
+  handleJoinRoom,
 }: IRoomBoxProps) => {
-  const router = useRouter();
   const handlejoin = async (id: string) => {
-    await apiClient.post(`rooms/group/join/${id}`);
-    updateRoomNavbar("joined", id, roomName);
-    router.push(`chat/${id}`);
+    handleJoinRoom({
+      id,
+      isRequiredPassword: requiredPassword,
+      name: roomName,
+    });
   };
   return (
     <Card
