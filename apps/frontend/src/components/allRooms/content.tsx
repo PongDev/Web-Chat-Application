@@ -31,7 +31,9 @@ const Content = () => {
     handleClose,
     handleCreate,
     setNewRoomName,
+    updateRoomNavbar,
   } = useCreateRoomDialog();
+
   const [cards, setCards] = useState<IRoom[]>([]);
   const fetchRooms = async () => {
     try {
@@ -73,6 +75,7 @@ const Content = () => {
               roomName={room.name}
               currentUser={room.userCount}
               id={room.id}
+              updateRoomNavbar={updateRoomNavbar}
             ></RoomBox>
           </Grid>
         ))}

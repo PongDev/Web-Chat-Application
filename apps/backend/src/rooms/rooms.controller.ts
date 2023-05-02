@@ -16,7 +16,6 @@ import {
   CreateRoomResultDto,
   JWTPayload,
   JoinGroupResultDto,
-  JoinedRoomDetailsDto,
   JoinedRoomsDto,
   RoomBriefDetailsDto,
   RoomInfoDto,
@@ -101,19 +100,6 @@ export class RoomsController {
     @Body('password') password: string,
   ): Promise<JoinGroupResultDto> {
     return this.roomsService.joinGroupRoom(user.userId, roomId, password);
-  }
-
-  @ApiBearerAuth()
-  @ApiResponse({
-    status: HttpStatus.OK,
-    type: [JoinedRoomDetailsDto],
-  })
-  @Get('/group/created')
-  @UseGuards(JwtAuthGuard)
-  async getCreatedRooms(
-    @User() user: JWTPayload,
-  ): Promise<JoinedRoomDetailsDto[]> {
-    return this.roomsService.getCreatedRooms(user.userId);
   }
 
   @ApiBearerAuth()

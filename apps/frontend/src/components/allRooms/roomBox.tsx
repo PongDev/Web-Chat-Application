@@ -5,16 +5,31 @@ import PersonIcon from "@mui/icons-material/Person";
 import theme from "@/config/theme";
 import apiClient from "@/config/axios";
 import { useRouter } from "next/router";
+import { UpdateRoomType } from "@/context/NavbarContext";
+
 interface IRoomBoxProps {
   currentUser: number;
   roomName: string;
   owner: string;
   id: string;
+  updateRoomNavbar: (
+    type: UpdateRoomType,
+    roomId: string,
+    roomName: string
+  ) => void;
 }
-const RoomBox = ({ currentUser, roomName, owner, id }: IRoomBoxProps) => {
+
+const RoomBox = ({
+  currentUser,
+  roomName,
+  owner,
+  id,
+  updateRoomNavbar,
+}: IRoomBoxProps) => {
   const router = useRouter();
-  const handlejoin = (id: string) => {
-    apiClient.post(`rooms/group/join/${id}`);
+  const handlejoin = async (id: string) => {
+    await apiClient.post(`rooms/group/join/${id}`);
+    updateRoomNavbar("joined", id, roomName);
     router.push(`chat/${id}`);
   };
   return (
