@@ -57,7 +57,7 @@ const NavBarProvider = ({ children }: PropsWithChildren) => {
           break;
         case "direct":
           setDirectMessages((prev) => {
-            if (prev.find((room) => room.id === roomId)) prev;
+            if (prev.find((room) => room.id === roomId)) return prev;
             return [...prev, roomInfo];
           });
           break;

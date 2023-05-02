@@ -198,6 +198,7 @@ function DrawerContent() {
         {NAVIGATION_CONTENT.map((text) => (
           <Link
             href={text.path}
+            key={`${text.label} ${text.path}`}
             passHref
             style={{ textDecoration: "none", color: "inherit" }}
           >
