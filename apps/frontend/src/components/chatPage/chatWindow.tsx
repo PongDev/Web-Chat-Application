@@ -24,6 +24,8 @@ const ChatWindow = () => {
   const handleSend = async () => {
     if (!message) return;
     await apiClient.post(`messages/${router.query.id}`, { content: message });
+    if (messageListRef.current)
+      messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
     setMessage("");
   };
 
