@@ -62,7 +62,7 @@ const Content = () => {
   }, [created]);
 
   return (
-    <Box paddingX={6} paddingY={2}>
+    <Box paddingX={6} paddingY={2} flex={1}>
       <Box sx={{ display: "flex" }} alignItems={"center"} paddingY={4}>
         <Typography variant="h4" component="span">
           {"All rooms"}
@@ -79,7 +79,7 @@ const Content = () => {
         container
         columnSpacing={8}
         rowSpacing={4}
-        sx={{ alignItems: "stretch" }}
+        sx={{ alignItems: "stretch", width: "100%" }}
       >
         {cards.map((room) => (
           <Grid item xs={12} sm={6} md={4} key={room.id}>
