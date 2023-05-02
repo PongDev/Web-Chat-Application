@@ -8,10 +8,10 @@ import {
   useMemo,
   useState,
 } from "react";
-import { JWTPayload } from "types";
+import { UserDto } from "types";
 
 interface IAuthContextValue {
-  user: JWTPayload | null;
+  user: UserDto | null;
   loading: boolean;
   logout: () => Promise<void>;
   refetch: () => Promise<void>;
@@ -21,12 +21,12 @@ const AuthContext = createContext<IAuthContextValue>({} as IAuthContextValue);
 const useUser = () => useContext(AuthContext);
 
 const AuthProvider = ({ children }: PropsWithChildren) => {
-  const [user, setUser] = useState<JWTPayload | null>(null);
+  const [user, setUser] = useState<UserDto | null>(null);
   const [loading, setLoading] = useState(true);
 
   const refetch = useCallback(async () => {
     try {
-      const res = await apiClient.get<JWTPayload>("/users/me");
+      const res = await apiClient.get<UserDto>("/users/me");
       setUser(res.data);
     } catch (err) {
       setUser(null);

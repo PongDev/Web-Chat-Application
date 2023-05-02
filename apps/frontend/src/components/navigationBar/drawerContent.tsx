@@ -27,6 +27,7 @@ import Link from "next/link";
 import { NextRouter, useRouter } from "next/router";
 import { JoinedRoomDetailsDto, JoinedRoomsDto } from "types";
 import useCreateNavBar from "@/hooks/useCreateNavBar";
+import { useNavBar } from "@/context/NavbarContext";
 
 function ItemGroups(
   groupName: string,
@@ -82,9 +83,10 @@ function ItemGroups(
 
 function HelloHeader() {
   const [open, setOpen] = useState(false);
-  const [workingName, setWorkingName] = useState("<Working Name>");
+  const [workingName, setWorkingName] = useState("");
   const [text, setText] = useState("");
-  const { updateUsername, getJoinedRooms, getCreatedRooms } = useCreateNavBar();
+  const { name } = useNavBar();
+  const { updateUsername } = useCreateNavBar();
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -93,11 +95,16 @@ function HelloHeader() {
     setOpen(false);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    await updateUsername(text);
     setWorkingName(text);
-    updateUsername(text);
     setOpen(false);
   };
+
+  useEffect(() => {
+    setWorkingName(name ?? "");
+  }, [name]);
+
   return (
     <Box paddingX={1} paddingY={2}>
       <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -163,29 +170,9 @@ const NAVIGATION_CONTENT = [
 ];
 
 function DrawerContent() {
-  const { updateUsername, getJoinedRooms, getCreatedRooms } = useCreateNavBar();
+  const { createdRooms, directMessages, joinedRooms } = useNavBar();
   const router = useRouter();
-  const [createdRooms, setCreatedRooms] = useState<JoinedRoomDetailsDto[]>([]);
-  const [joinedRooms, setJoinedRooms] = useState<JoinedRoomDetailsDto[]>([]);
-  const [directMessages, setDirectMessages] = useState<JoinedRoomDetailsDto[]>(
-    []
-  );
 
-  useEffect(() => {
-    const fetchRooms = async () => {
-      const newCreatedRooms: JoinedRoomDetailsDto[] = await getCreatedRooms();
-      const joinedAndDM: JoinedRoomsDto = await getJoinedRooms();
-      setCreatedRooms(newCreatedRooms);
-      setJoinedRooms(joinedAndDM.groupRoom);
-      setDirectMessages(joinedAndDM.directRoom);
-    };
-    fetchRooms();
-  }, []);
-
-  const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault();
-    router.push(event.currentTarget.href);
-  };
   return (
     <Box paddingLeft={2}>
       <HelloHeader />

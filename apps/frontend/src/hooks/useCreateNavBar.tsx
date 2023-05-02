@@ -1,18 +1,18 @@
 import apiClient from "@/config/axios";
-import { JoinedRoomsDto } from "types";
+import { useCallback } from "react";
 
 const useCreateNavBar = () => {
-  const updateUsername = async (newName: string) => {
+  const updateUsername = useCallback(async (newName: string) => {
     try {
       await apiClient.put(`/users/me`, {
-        username: newName,
+        name: newName,
       });
     } catch (error) {
       console.error(error);
     }
-  };
+  }, []);
 
-  const getJoinedRooms = async () => {
+  const getJoinedRooms = useCallback(async () => {
     try {
       const response = await apiClient.get(`/rooms/joined`);
       const data = response.data;
@@ -20,15 +20,17 @@ const useCreateNavBar = () => {
     } catch (error) {
       console.error(error);
     }
-  };
-  const getCreatedRooms = async () => {
+  }, []);
+
+  const getCreatedRooms = useCallback(async () => {
     try {
       const response = await apiClient.get(`/rooms/group/created`);
       return response.data;
     } catch (error) {
       console.error(error);
     }
-  };
+  }, []);
+
   return {
     updateUsername,
     getJoinedRooms,
